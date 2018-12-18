@@ -9,11 +9,8 @@ public class Parser {
 
 	private File targetFile;
 	
-	private City accessCity;
-	
-	private Parser(File targetFile, City accessCity) {
+	private Parser(File targetFile) {
 		this.targetFile = targetFile;
-		this.accessCity = accessCity;
 	}
 
 	private Pattern urlPattern = Pattern.compile("data-landurl=[\"]([^\"]+)[\"]");
@@ -93,7 +90,6 @@ public class Parser {
 
 	public AD parseAAd(String text) {
 		AD ad = new AD();
-		ad.setCity(accessCity.name().toLowerCase());
 		Matcher h3m = h3Pattern.matcher(text);
 		if (h3m.find()) {
 			String h3 = h3m.group(0);
@@ -105,9 +101,9 @@ public class Parser {
 			if (org != null) {
 				ad.setOrganization(org);
 			}
-			String datestr = orgm.group(2);
-			if (datestr != null) {
-				ad.setDatestr(datestr);
+			String dateInPage = orgm.group(2);
+			if (dateInPage != null) {
+				ad.setDateInPage(dateInPage);
 			}
 		}
 		Matcher bodym = bodyPattern.matcher(text);
@@ -144,25 +140,11 @@ public class Parser {
 			String allADTexts = matcher.group(1);
 			adlist = getADlist(allADTexts + "<!--");
 		}
-		for (int i = 0, len = adlist.size(); i < len; i++) {
-			adlist.get(i).setRank(i + 1);
-		}
 		return adlist;
 	}
+
 	
-	public static ArrayList<AD> parseAFile(String filePath, City accessCity) throws IOException {
-		if (filePath == null || filePath.trim().equals("")) {
-			throw new FileNotFoundException("filePath required");
-		}
-		File targetFile = new File(filePath);
-		if (!targetFile.exists() || !targetFile.isFile()) {
-			throw new FileNotFoundException();
-		}
-		Parser parser = new Parser(targetFile, accessCity);
-		return parser.runParser();
-	}
-	
-	public static long getTimestampOfResultFile(City city, String datestr) throws FileNotFoundException {
+	public static long getTimestampOfResultFile(City city, String datestr, KeyWords key) throws FileNotFoundException {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		String dirPath = basePath + city.name().toLowerCase();
 //		System.err.println(dirPath);
@@ -171,26 +153,74 @@ public class Parser {
 			throw new FileNotFoundException();
 		}
 		String[] fileNameList = dir.list();
+		Pattern p = Pattern.compile(key.ordinal() + "_" + datestr + "_(\\d+)\\.html");
 		for (String fileName : fileNameList) {
-			if (fileName.indexOf(datestr) > 0) {
-				System.err.println(fileName);
+			Matcher m = p.matcher(fileName);
+			if (m.matches()) {
+				return Long.parseLong(m.group(1));
+//				System.err.println(m.group(1));
 			}
-			System.out.println(fileName);
+//			System.out.println(fileName);
 		}
-		return 0;
+		return -1;
 	}
 
-	public static ArrayList<AD> parseResultInBase(City city, String datestr, KeyWords key) {
+	public static ArrayList<AD> parseResultInBase(City city, String datestr, KeyWords key) throws IOException {
 		final String basePath = "/home/ben/Develop/spider/html/";
-		String filePath = basePath + city.name() + "";
-		return null;
+		long timestamp = getTimestampOfResultFile(city, datestr, key);
+		if (timestamp < 0) {
+			throw new FileNotFoundException();
+		}
+		StringBuilder filePath = new StringBuilder(basePath);
+		filePath.append(city.name().toLowerCase());
+		filePath.append('/');
+		filePath.append(key.ordinal());
+		filePath.append('_');
+		filePath.append(datestr);
+		filePath.append('_');
+		filePath.append(timestamp);
+		filePath.append(".html");
+//		System.out.println(filePath);
+		ArrayList<AD> adlist = parseResultFile(filePath.toString());
+		fillField(adlist, city, timestamp, datestr); 
+		return adlist;
 	}
-
-	public static void main(String[] args) {
-		try {
-			System.out.println(getTimestampOfResultFile(City.BEIJING,	"20181218p"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+	
+	private static ArrayList<AD> parseResultFile(String filePath) throws IOException {
+		if (filePath == null || filePath.trim().equals("")) {
+			throw new FileNotFoundException("filePath error");
+		}
+		File targetFile = new File(filePath);
+		if (!targetFile.exists() || !targetFile.isFile()) {
+			throw new FileNotFoundException();
+		}
+		return new Parser(targetFile).runParser();
+	}
+	
+	private static void fillField(ArrayList<AD> adlist, City city, long timestamp, String datestr) {
+		if (adlist == null) {
+			return ;
+		}
+		for (int i = 0, len = adlist.size(); i < len; i++) {
+			AD ad = adlist.get(i);
+			ad.setRank(i + 1);
+			ad.setCity(city.name().toLowerCase());
+			ad.setTimestamp(timestamp);
+			ad.setAccessDatestr(datestr);
 		}
 	}
+
+	public static ArrayList<AD> parseAFile(String filePath, City accessCity, String datestr) throws IOException {
+		if (filePath == null || filePath.trim().equals("")) {
+			throw new FileNotFoundException("filePath required");
+		}
+		File targetFile = new File(filePath);
+		if (!targetFile.exists() || !targetFile.isFile()) {
+			throw new FileNotFoundException();
+		}
+		ArrayList<AD> adlist = new Parser(targetFile).runParser();
+		fillField(adlist, accessCity, -1, datestr); 
+		return adlist;
+	}
+	
 }

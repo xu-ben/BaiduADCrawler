@@ -13,7 +13,9 @@ public class AD {
 	
 	private String url;
 	
-	private String datestr;
+	private String dateInPage;
+	
+	private String accessDatestr;
 	
 	private long timestamp;
 	
@@ -24,20 +26,8 @@ public class AD {
 		this.organization = null;
 		this.context = null;
 		this.url = null;
-		this.datestr = null;
+		this.dateInPage = null;
 		this.timestamp = 0;
-	}
-
-	public AD(int rank, String city, String title, String organization, String context, String url, String datestr,
-			long timestamp) {
-		this.rank = rank;
-		this.city = city;
-		this.title = title;
-		this.organization = organization;
-		this.context = context;
-		this.url = url;
-		this.datestr = datestr;
-		this.timestamp = timestamp;
 	}
 
 
@@ -97,12 +87,20 @@ public class AD {
 		this.url = url;
 	}
 
-	public String getDatestr() {
-		return datestr;
+	public String getDateInPage() {
+		return dateInPage;
 	}
 
-	public void setDatestr(String datestr) {
-		this.datestr = datestr;
+	public void setDateInPage(String dateInPage) {
+		this.dateInPage = dateInPage;
+	}
+
+	public String getAccessDatestr() {
+		return accessDatestr;
+	}
+
+	public void setAccessDatestr(String accessDatestr) {
+		this.accessDatestr = accessDatestr;
 	}
 
 	
