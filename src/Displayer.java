@@ -6,6 +6,7 @@ public class Displayer {
 	public static void displayAD(AD ad) {
 		System.out.println("rank:\t" + ad.getRank());
 		System.out.println("title:\t" + ad.getTitle());
+		System.out.println("access location:\t" + ad.getCity());
 		System.out.println("org:\t" + ad.getOrganization());
 		System.out.println("date:\t" + ad.getDatestr());
 		System.out.println("url:\t" + ad.getUrl());

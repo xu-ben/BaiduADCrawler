@@ -129,7 +129,8 @@ public class Spider {
 	}
 
 	public static void main(String[] args) {
-		System.err.println(crawlAllCityAt(2018, 12, 18, 9, 2));
+		System.err.println(crawlAllCityAt(2018, 12, 18, 15, 3));
+//		System.err.println(crawlAllCityAt(2018, 12, 19, 9, 2));
 
 //		test();
 //		Spider spider = new Spider();

@@ -93,6 +93,7 @@ public class Parser {
 
 	public AD parseAAd(String text) {
 		AD ad = new AD();
+		ad.setCity(accessCity.name().toLowerCase());
 		Matcher h3m = h3Pattern.matcher(text);
 		if (h3m.find()) {
 			String h3 = h3m.group(0);
