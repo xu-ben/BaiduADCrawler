@@ -151,36 +151,11 @@ public class Parser {
 		}
 		return adlist;
 	}
-
-	public static void displayAD(AD ad) {
-		System.out.println(ad.getRank());
-		System.out.println(ad.getTitle());
-		System.out.println(ad.getOrganization());
-		System.out.println(ad.getDatestr());
-		System.out.println(ad.getUrl());
-		System.out.println(ad.getContext());
-		System.out.println();
-		System.out.println();
-	}
-
 	
-	public static void test() {
-		String basepath = "/home/ben/Develop/spider/";
-//		String file = "html/haerbin/0_20181217a_1545008406917.html";
-		String file = "20181213p_.html";
-		try {
-			Parser p = new Parser(basepath + file);
-			ArrayList<AD> adlist = p.runParser();
-			for (AD ad : adlist) {
-				displayAD(ad);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void main(String[] args) {
-		test();
+	public static ArrayList<AD> parseAResultFile(City city) {
+		final String basePath = "/home/ben/Develop/spider/html/";
+		String filePath = basePath + city.name() + "";
+		return null;
 	}
 
 }
