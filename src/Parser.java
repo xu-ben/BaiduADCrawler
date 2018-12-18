@@ -35,15 +35,15 @@ public class Parser {
 	
 	
 	// 一般顔色是＃CC0000
-	private Pattern textPattern = Pattern.compile("([^<>]+)|(<font[^>]+>([^<>]+)</font>)");
+	private Pattern textPattern = Pattern.compile("((?<=>)[^<>]+)|(<font[^>]+>([^<>]+)</font>)");
 	private StringBuilder getTextFromFontHtml(StringBuilder html) {
 		Matcher m = textPattern.matcher(html);
 		StringBuilder text = new StringBuilder();
 		while (m.find()) {
-			if (m.group(1) != null && !m.group(1).startsWith("font")) {
+			if (m.group(1) != null) {
 				text.append(m.group(1));
 			}
-			if (m.group(3) != null && !m.group(3).startsWith("font")) {
+			if (m.group(3) != null) {
 				text.append(m.group(3));
 			}
 		}
@@ -68,7 +68,7 @@ public class Parser {
 		return getTextFromFontHtml(context);
 	}
 
-	private Pattern aLabelPattern = Pattern.compile("<a([^>]+)>(.+?)</a>");
+	private Pattern aLabelPattern = Pattern.compile("<a([^>]+)(>.+?<)/a>");
 //	private Pattern aLabelPattern = Pattern
 //			.compile("<a([^>]+)>((([^<>]+)|(<font color=#CC0000>[^<>]+</font>))+)</a>");
 	private void parseh3(AD ad, String h3) {
