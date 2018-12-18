@@ -162,10 +162,35 @@ public class Parser {
 		return parser.runParser();
 	}
 	
-	public static ArrayList<AD> parseAResultFile(City city) {
+	public static long getTimestampOfResultFile(City city, String datestr) throws FileNotFoundException {
+		final String basePath = "/home/ben/Develop/spider/html/";
+		String dirPath = basePath + city.name().toLowerCase();
+//		System.err.println(dirPath);
+		File dir = new File(dirPath);
+		if (dir == null || !dir.exists() || !dir.isDirectory()) {
+			throw new FileNotFoundException();
+		}
+		String[] fileNameList = dir.list();
+		for (String fileName : fileNameList) {
+			if (fileName.indexOf(datestr) > 0) {
+				System.err.println(fileName);
+			}
+			System.out.println(fileName);
+		}
+		return 0;
+	}
+
+	public static ArrayList<AD> parseResultInBase(City city, String datestr) {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		String filePath = basePath + city.name() + "";
 		return null;
 	}
 
+	public static void main(String[] args) {
+		try {
+			System.out.println(getTimestampOfResultFile(City.BEIJING,	"20181218p"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 }
