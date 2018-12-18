@@ -11,8 +11,13 @@ public class Spider {
 	
 	private void crawlPageToFile(String cityname, String date, String proxy, int keyindex) {
 		String rootdir = String.format("/home/ben/Develop/spider/html/%s", cityname);
+		if (proxy == null) {
+			proxy = "";
+		} else {
+			proxy = "-x " + proxy;
+		}
 		long time = System.currentTimeMillis();
-		final String basestr = "curl -A \"%s\" -x %s \"%s%s\" > %d_%s_%d.html";
+		final String basestr = "curl -A \"%s\" %s \"%s%s\" > %d_%s_%d.html";
 		String cmd = String.format(basestr, userAgent, proxy, bdurl, keys[keyindex], keyindex, date, time);
 		System.err.println(cmd);
 		try {
@@ -26,9 +31,11 @@ public class Spider {
 	}
 	
 	
+	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
+	
 	public String getProxyStr(City city) throws IOException {
 		String rootdir = "/home/ben/Develop/spider/html";
-		String baseurl = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=45&mr=1&regions=";
+		String baseurl = FREE_URL;
 		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
 		String cmd = String.format("curl -A \"%s\" \"%s\"", userAgent, url);
 		System.err.println(cmd);
@@ -42,9 +49,9 @@ public class Spider {
 
 	public boolean crawl(City city, String date) throws IOException {
 		System.err.println(city.name().toLowerCase());
-		String proxy = getProxyStr(city);
+		String proxy = city.isUseProxy() ? getProxyStr(city) : null;
 		boolean ret = false;
-		if (proxy != null) {
+		if (!city.isUseProxy() || proxy != null) {
 			String citystr = city.name().toLowerCase();
 			crawlPageToFile(citystr, date, proxy, 0);
 			crawlPageToFile(citystr, date, proxy, 1);
@@ -69,7 +76,7 @@ public class Spider {
 	public boolean crawlAllCity(String datestr) {
 		boolean success = true;
 		for (City city : City.values()) {
-			if (city.getCitycode() > 0) {
+			if (!city.isUseProxy() || city.getCitycode() > 0) {
 				try {
 					success &= this.crawl(city, datestr);
 				} catch (IOException e) {
@@ -94,10 +101,9 @@ public class Spider {
 				if (Math.abs(ct - date.getTime()) < 5000) {
 					// TODO
 					System.err.printf("datetime:%d,\t nowtime:%d,\t%s\n", datetime, ct, datestr);
-//					Spider spider = new Spider();
-//					return spider.crawlAllCity(datestr);
-//					Thread.sleep(5000);
-					return true;
+					Spider spider = new Spider();
+					return spider.crawlAllCity(datestr);
+//					return true;
 				} else {
 					if (lognum % 100 == 0) {
 						System.out.printf("nowtime:%s\n", new Date(ct).toString());
@@ -117,13 +123,13 @@ public class Spider {
 	}
 
 	public static void test() {
-		String datestr = "20181217p";
+		String datestr = "20181218a";
 		Spider spider = new Spider();
 		spider.crawlAllCity(datestr);
 	}
 
 	public static void main(String[] args) {
-		System.err.println(crawlAllCityAt(2018, 12, 17, 17, 30));
+		System.err.println(crawlAllCityAt(2018, 12, 18, 9, 2));
 
 //		test();
 //		Spider spider = new Spider();
@@ -132,12 +138,6 @@ public class Spider {
 //		spider.getProxyStr(City.GUANGZHOU);
 //		spider.crawl(City.SHANGHAI, "20181214p");
 		// spider.crawl(City.BEIJING.name().toLowerCase(), "20181214p");
-		// for (City c : City.values()) {
-		// spider.crawl(c.name().toLowerCase(), "20181214p");
-		// System.out.println(c.name());
-		// System.out.println(c.name().toLowerCase());
-		// System.out.println(c.ordinal());
-		// }
 
 	}
 
