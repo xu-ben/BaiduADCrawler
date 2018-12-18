@@ -9,7 +9,7 @@ public class Parser {
 
 	private File htmlFile;
 
-	Parser(String filePath) throws FileNotFoundException {
+	public Parser(String filePath) throws FileNotFoundException {
 		if (filePath == null) {
 			throw new FileNotFoundException("filePath must not be null");
 		}
@@ -21,7 +21,7 @@ public class Parser {
 
 	private Pattern urlPattern = Pattern.compile("data-landurl=[\"]([^\"]+)[\"]");
 
-	public void parseURL(AD ad, StringBuilder urlText) {
+	private void parseURL(AD ad, StringBuilder urlText) {
 		Matcher m = urlPattern.matcher(urlText);
 		StringBuilder urlsb = new StringBuilder();
 		while (m.find()) {
@@ -32,50 +32,92 @@ public class Parser {
 //		System.err.println();
 //		System.err.println();
 	}
-
-	private Pattern titleTextPattern = Pattern.compile("([^<>]+)|(<font[^>]+>([^<>]+)</font>)");
-
-	public void parseTitle(AD ad, StringBuilder titleHtml) {
-		Matcher m = titleTextPattern.matcher(titleHtml);
-		StringBuilder title = new StringBuilder();
+	
+	
+	// 一般顔色是＃CC0000
+	private Pattern textPattern = Pattern.compile("([^<>]+)|(<font[^>]+>([^<>]+)</font>)");
+	private StringBuilder getTextFromFontHtml(StringBuilder html) {
+		Matcher m = textPattern.matcher(html);
+		StringBuilder text = new StringBuilder();
 		while (m.find()) {
-			if (m.group(1) != null) {
-				title.append(m.group(1));
+			if (m.group(1) != null && !m.group(1).startsWith("font")) {
+				text.append(m.group(1));
 			}
-			if (m.group(3) != null) {
-				title.append(m.group(3));
+			if (m.group(3) != null && !m.group(3).startsWith("font")) {
+				text.append(m.group(3));
 			}
 		}
-		ad.setTitle(title.toString());
+		return text;
+	}
+	
+	public StringBuilder getHtmlContextInALabel(String html) {
+		Matcher matcher = aLabelPattern.matcher(html);
+		StringBuilder context = new StringBuilder();
+		while (matcher.find()) {
+			context.append(matcher.group(2));
+		}
+		return context;
+	}
+	
+	public StringBuilder getTextInALabel(String html) {
+		Matcher matcher = aLabelPattern.matcher(html);
+		StringBuilder context = new StringBuilder();
+		while (matcher.find()) {
+			context.append(matcher.group(2));
+		}
+		return getTextFromFontHtml(context);
 	}
 
-	private Pattern titleHtmlPattern = Pattern
-			.compile("<a([^>]+)>((([^<>]+)|(<font color=#CC0000>[^<>]+</font>))+)</a>");
-
-	public void parseh3(AD ad, String h3) {
-		Matcher matcher = titleHtmlPattern.matcher(h3);
+	private Pattern aLabelPattern = Pattern.compile("<a([^>]+)>(.+?)</a>");
+//	private Pattern aLabelPattern = Pattern
+//			.compile("<a([^>]+)>((([^<>]+)|(<font color=#CC0000>[^<>]+</font>))+)</a>");
+	private void parseh3(AD ad, String h3) {
+		Matcher matcher = aLabelPattern.matcher(h3);
 		StringBuilder titleHtml = new StringBuilder();
 		StringBuilder urlText = new StringBuilder();
 		while (matcher.find()) {
 			urlText.append(matcher.group(1));
 			titleHtml.append(matcher.group(2));
 		}
-		parseTitle(ad, titleHtml);
+		StringBuilder titleText = getTextFromFontHtml(titleHtml);
+		ad.setTitle(titleText == null ? null : titleText.toString());
 		// System.out.println(titleHtml);
 		parseURL(ad, urlText);
 	}
+	
+	
+	private void parseBody(AD ad, String body) {
+//		System.out.println(body);
+		StringBuilder bodyText = getTextInALabel(body);
+		ad.setContext(bodyText == null ? null : bodyText.toString());
+	}
 
 	private Pattern h3Pattern = Pattern.compile("<h3(.+?)</h3>");
+	private Pattern orgPattern = Pattern.compile("<span[^<>]+>([^<>]+)</span>[^<>]*<span[^<>]+>([^<>]+)</span>");
+	private Pattern bodyPattern = Pattern.compile("<div class=\"\">(.+?)</div>");
 
 	public AD parseAAd(String text) {
 		AD ad = new AD();
-		Matcher matcher = h3Pattern.matcher(text);
-		if (matcher.find()) {
-			String h3 = matcher.group(0);
+		Matcher h3m = h3Pattern.matcher(text);
+		if (h3m.find()) {
+			String h3 = h3m.group(0);
 			parseh3(ad, h3);
-			if (ad.getTitle() == null) {
-				ad.setContext(h3);
+		}
+		Matcher orgm = orgPattern.matcher(text);
+		if (orgm.find()) {
+			String org = orgm.group(1);
+			if (org != null) {
+				ad.setOrganization(org);
 			}
+			String datestr = orgm.group(2);
+			if (datestr != null) {
+				ad.setDatestr(datestr);
+			}
+		}
+		Matcher bodym = bodyPattern.matcher(text);
+		if (bodym.find()) {
+			String body = bodym.group(1);
+			parseBody(ad, body);
 		}
 		return ad;
 	}
@@ -125,14 +167,18 @@ public class Parser {
 		}
 		System.out.println(ad.getRank());
 		System.out.println(title);
+		System.out.println(ad.getOrganization());
+		System.out.println(ad.getDatestr());
 		System.out.println(ad.getUrl());
+		System.out.println(ad.getContext());
 		System.out.println();
 		System.out.println();
 	}
 
 	public static void main(String[] args) {
 		String basepath = "/home/ben/Develop/spider/";
-		String file = "html/haerbin/0_20181217a_1545008406917.html";
+//		String file = "html/haerbin/0_20181217a_1545008406917.html";
+		String file = "20181213p_.html";
 		try {
 			Parser p = new Parser(basepath + file);
 			p.runParser();

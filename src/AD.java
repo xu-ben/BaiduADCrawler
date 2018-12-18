@@ -13,6 +13,8 @@ public class AD {
 	
 	private String url;
 	
+	private String datestr;
+	
 	private long timestamp;
 	
 	public AD() {
@@ -22,17 +24,22 @@ public class AD {
 		this.organization = null;
 		this.context = null;
 		this.url = null;
+		this.datestr = null;
+		this.timestamp = 0;
 	}
 
-	public AD(int rank, String city, String title, String organization, String context, String url, long timestamp) {
+	public AD(int rank, String city, String title, String organization, String context, String url, String datestr,
+			long timestamp) {
 		this.rank = rank;
 		this.city = city;
 		this.title = title;
 		this.organization = organization;
 		this.context = context;
 		this.url = url;
+		this.datestr = datestr;
 		this.timestamp = timestamp;
 	}
+
 
 	public int getRank() {
 		return rank;
@@ -89,5 +96,14 @@ public class AD {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+	public String getDatestr() {
+		return datestr;
+	}
+
+	public void setDatestr(String datestr) {
+		this.datestr = datestr;
+	}
+
 	
 }
