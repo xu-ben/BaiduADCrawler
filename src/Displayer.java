@@ -17,11 +17,10 @@ public class Displayer {
 	
 	public static void test() {
 		String basepath = "/home/ben/Develop/spider/";
-		String file = "html/haerbin/0_20181217a_1545008406917.html";
-//		String file = "20181213p_.html";
+//		String file = "html/haerbin/0_20181217a_1545008406917.html";
+		String file = "20181213p_.html";
 		try {
-			Parser p = new Parser(basepath + file);
-			ArrayList<AD> adlist = p.runParser();
+			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING);
 			for (AD ad : adlist) {
 				displayAD(ad);
 			}

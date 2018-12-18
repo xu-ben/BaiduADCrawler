@@ -7,16 +7,13 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-	private File htmlFile;
-
-	public Parser(String filePath) throws FileNotFoundException {
-		if (filePath == null) {
-			throw new FileNotFoundException("filePath must not be null");
-		}
-		htmlFile = new File(filePath);
-		if (!htmlFile.exists()) {
-			throw new FileNotFoundException();
-		}
+	private File targetFile;
+	
+	private City accessCity;
+	
+	private Parser(File targetFile, City accessCity) {
+		this.targetFile = targetFile;
+		this.accessCity = accessCity;
 	}
 
 	private Pattern urlPattern = Pattern.compile("data-landurl=[\"]([^\"]+)[\"]");
@@ -141,7 +138,7 @@ public class Parser {
 
 	public ArrayList<AD> runParser() throws IOException {
 		ArrayList<AD> adlist = null;
-		Matcher matcher = ppimPattern.matcher(Commons.getTextFromFile(htmlFile));
+		Matcher matcher = ppimPattern.matcher(Commons.getTextFromFile(targetFile));
 		while (matcher.find()) {
 			String allADTexts = matcher.group(1);
 			adlist = getADlist(allADTexts + "<!--");
@@ -150,6 +147,18 @@ public class Parser {
 			adlist.get(i).setRank(i + 1);
 		}
 		return adlist;
+	}
+	
+	public static ArrayList<AD> parseAFile(String filePath, City accessCity) throws IOException {
+		if (filePath == null || filePath.trim().equals("")) {
+			throw new FileNotFoundException("filePath required");
+		}
+		File targetFile = new File(filePath);
+		if (!targetFile.exists() || !targetFile.isFile()) {
+			throw new FileNotFoundException();
+		}
+		Parser parser = new Parser(targetFile, accessCity);
+		return parser.runParser();
 	}
 	
 	public static ArrayList<AD> parseAResultFile(City city) {
