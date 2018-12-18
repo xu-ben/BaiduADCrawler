@@ -7,9 +7,7 @@ public class Spider {
 
 	private String bdurl = "https://www.baidu.com/s?ie=utf-8&wd=";
 
-	private String[] keys = { "丰胸", "隆胸" };
-	
-	private void crawlPageToFile(String cityname, String date, String proxy, int keyindex) {
+	private void crawlPageToFile(String cityname, String date, String proxy, KeyWords key) {
 		String rootdir = String.format("/home/ben/Develop/spider/html/%s", cityname);
 		if (proxy == null) {
 			proxy = "";
@@ -18,7 +16,7 @@ public class Spider {
 		}
 		long time = System.currentTimeMillis();
 		final String basestr = "curl -A \"%s\" %s \"%s%s\" > %d_%s_%d.html";
-		String cmd = String.format(basestr, userAgent, proxy, bdurl, keys[keyindex], keyindex, date, time);
+		String cmd = String.format(basestr, userAgent, proxy, bdurl, key.getStr(), key.ordinal(), date, time);
 		System.err.println(cmd);
 		try {
 			String ret = Commons.ExecCmdInDir(cmd, rootdir);
@@ -53,8 +51,9 @@ public class Spider {
 		boolean ret = false;
 		if (!city.isUseProxy() || proxy != null) {
 			String citystr = city.name().toLowerCase();
-			crawlPageToFile(citystr, date, proxy, 0);
-			crawlPageToFile(citystr, date, proxy, 1);
+			for (KeyWords key : KeyWords.values()) {
+				crawlPageToFile(citystr, date, proxy, key);
+			}
 			ret = true;
 		}
 		System.err.println();

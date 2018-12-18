@@ -180,7 +180,7 @@ public class Parser {
 		return 0;
 	}
 
-	public static ArrayList<AD> parseResultInBase(City city, String datestr) {
+	public static ArrayList<AD> parseResultInBase(City city, String datestr, KeyWords key) {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		String filePath = basePath + city.name() + "";
 		return null;
