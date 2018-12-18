@@ -29,8 +29,6 @@ public class Parser {
 		}
 		ad.setUrl(urlsb.toString());
 //		System.err.println(urlsb);
-//		System.err.println();
-//		System.err.println();
 	}
 	
 	
@@ -141,32 +139,22 @@ public class Parser {
 
 	private Pattern ppimPattern = Pattern.compile("<!-- new ppim -->([^\r\n]+)\n");
 
-	public void runParser() {
+	public ArrayList<AD> runParser() throws IOException {
 		ArrayList<AD> adlist = null;
-		try {
-			Matcher matcher = ppimPattern.matcher(Commons.getTextFromFile(htmlFile));
-			while (matcher.find()) {
-				String text = matcher.group(1);
-				// System.out.println(text);
-				adlist = getADlist(text + "<!--");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		Matcher matcher = ppimPattern.matcher(Commons.getTextFromFile(htmlFile));
+		while (matcher.find()) {
+			String allADTexts = matcher.group(1);
+			adlist = getADlist(allADTexts + "<!--");
 		}
-		// todo display
 		for (int i = 0, len = adlist.size(); i < len; i++) {
 			adlist.get(i).setRank(i + 1);
-			displayAD(adlist.get(i));
 		}
+		return adlist;
 	}
 
 	public static void displayAD(AD ad) {
-		String title = ad.getTitle();
-		if (title == null || title.trim().equals("")) {
-			title = ad.getContext();
-		}
 		System.out.println(ad.getRank());
-		System.out.println(title);
+		System.out.println(ad.getTitle());
 		System.out.println(ad.getOrganization());
 		System.out.println(ad.getDatestr());
 		System.out.println(ad.getUrl());
@@ -175,16 +163,24 @@ public class Parser {
 		System.out.println();
 	}
 
-	public static void main(String[] args) {
+	
+	public static void test() {
 		String basepath = "/home/ben/Develop/spider/";
 //		String file = "html/haerbin/0_20181217a_1545008406917.html";
 		String file = "20181213p_.html";
 		try {
 			Parser p = new Parser(basepath + file);
-			p.runParser();
+			ArrayList<AD> adlist = p.runParser();
+			for (AD ad : adlist) {
+				displayAD(ad);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+		test();
 	}
 
 }
