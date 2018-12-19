@@ -29,11 +29,14 @@ public class Spider {
 	}
 	
 	
-	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
+	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
+	
+	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
 	
 	public String getProxyStr(City city) throws IOException {
 		String rootdir = "/home/ben/Develop/spider/html";
 		String baseurl = FREE_URL;
+//		String baseurl = FIVE_URL;
 		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
 		String cmd = String.format("curl -A \"%s\" \"%s\"", userAgent, url);
 		System.err.println(cmd);
@@ -71,6 +74,18 @@ public class Spider {
 		}
 	}
 	
+	public boolean crawlSomeCity(City[] cities, String datestr) {
+		boolean success = true;
+		for (City city : cities) { 
+			try {
+				success &= this.crawl(city, datestr);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return success;
+	}
 	
 	public boolean crawlAllCity(String datestr) {
 		boolean success = true;
@@ -126,10 +141,19 @@ public class Spider {
 		Spider spider = new Spider();
 		spider.crawlAllCity(datestr);
 	}
+	
+	public static void complement() {
+		String datestr = "20181219p";
+		Spider spider = new Spider();
+		City[] cities = {City.SHENYANG, City.HAERBIN};
+		spider.crawlSomeCity(cities, datestr);
+	}
 
 	public static void main(String[] args) {
 //		System.err.println(crawlAllCityAt(2018, 12, 18, 15, 3));
-		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
+//		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
+//		System.err.println(crawlAllCityAt(2018, 12, 19, 15, 3));
+		complement();
 
 //		test();
 //		Spider spider = new Spider();
