@@ -59,17 +59,23 @@ public class Parser {
 		}
 		return getTextFromFontHtml(context);
 	}
-
+	
+	// a标签的内容里可能有引号，但标签属性里的字符串中不含有<>
 	private Pattern aLabelPattern = Pattern.compile("<a([^>]+)(>.+?<)/a>");
+
+	// a标签属性里的字符串中可能含有<>，但标签的内容里没有引号的情况
+	private Pattern aLabelPattern2 = Pattern.compile("<a (.+?)(>[^\"]+<)/a>");
 //	private Pattern aLabelPattern = Pattern
 //			.compile("<a([^>]+)>((([^<>]+)|(<font color=#CC0000>[^<>]+</font>))+)</a>");
-	private void parseh3(AD ad, String h3) {
-		Matcher matcher = aLabelPattern.matcher(h3);
+	private void parseContentInH3(AD ad, String h3) {
+//		System.err.println(h3);
+//		System.err.println();
+		Matcher mh3 = aLabelPattern2.matcher(h3);
 		StringBuilder titleHtml = new StringBuilder();
 		StringBuilder urlText = new StringBuilder();
-		while (matcher.find()) {
-			urlText.append(matcher.group(1));
-			titleHtml.append(matcher.group(2));
+		while (mh3.find()) {
+			urlText.append(mh3.group(1));
+			titleHtml.append(mh3.group(2));
 		}
 		StringBuilder titleText = getTextFromFontHtml(titleHtml);
 		ad.setTitle(titleText == null ? null : titleText.toString());
@@ -84,7 +90,7 @@ public class Parser {
 		ad.setContext(bodyText == null ? null : bodyText.toString());
 	}
 
-	private Pattern h3Pattern = Pattern.compile("<h3(.+?)</h3>");
+	private Pattern h3Pattern = Pattern.compile("<h3[^>]*>(.+?)</h3>");
 	private Pattern orgPattern = Pattern.compile("<span[^<>]+>([^<>]+)</span>[^<>]*<span[^<>]+>([^<>]+)</span>");
 	private Pattern bodyPattern = Pattern.compile("<div class=\"\">(.+?)</div>");
 
@@ -92,8 +98,8 @@ public class Parser {
 		AD ad = new AD();
 		Matcher h3m = h3Pattern.matcher(text);
 		if (h3m.find()) {
-			String h3 = h3m.group(0);
-			parseh3(ad, h3);
+			String h3 = h3m.group(1);
+			parseContentInH3(ad, h3);
 		}
 		Matcher orgm = orgPattern.matcher(text);
 		if (orgm.find()) {

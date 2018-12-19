@@ -29,21 +29,6 @@ public class Displayer {
 	}
 
 	
-	public static void test1() {
-		String basepath = "/home/ben/Develop/spider/";
-//		String file = "html/haerbin/0_20181217a_1545008406917.html";
-		String file = "20181213p_.html";
-		try {
-			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING, "20181213p");
-			for (AD ad : adlist) {
-				simpleDisplay(ad);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
 	/**
 	 * 把某个时间，指定城市的结果输出
 	 * @param city
@@ -66,9 +51,25 @@ public class Displayer {
 		}
 	}
 
+	
+	public static void test1() {
+		String basepath = "/home/ben/Develop/spider/";
+//		String file = "html/haerbin/0_20181217a_1545008406917.html";
+//		String file = "20181213p_.html";
+		String file = "html/hefei/0_20181219a_1545185188303.origin.html";
+		try {
+			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING, "20181213p");
+			for (AD ad : adlist) {
+				simpleDisplay(ad);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void test2() {
 		try {
-			displayAtACityAndOnADate(City.HANGZHOU, "20181219a");
+			displayAtACityAndOnADate(City.HEFEI, "20181219a");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
