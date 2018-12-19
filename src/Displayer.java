@@ -46,7 +46,11 @@ public class Displayer {
 
 	public static void test2() {
 		try {
-			ArrayList<AD> adlist = Parser.parseResultInBase(City.BEIJING, "20181218p", KeyWords.FENGXIONG);
+			ArrayList<AD> adlist = Parser.parseResultInBase(City.KUNMING, "20181219a", KeyWords.FENGXIONG);
+			if (adlist == null) {
+				System.out.println("no ADs found");
+				return;
+			}
 			for (AD ad : adlist) {
 				fullDisplay(ad);
 			}

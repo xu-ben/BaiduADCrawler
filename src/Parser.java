@@ -135,7 +135,11 @@ public class Parser {
 
 	public ArrayList<AD> runParser() throws IOException {
 		ArrayList<AD> adlist = null;
-		Matcher matcher = ppimPattern.matcher(Commons.getTextFromFile(targetFile));
+		String fileContent = Commons.getTextFromFile(targetFile);
+		if (fileContent == null || fileContent.trim().equals("")) {
+			throw new FileNotFoundException("this file is empty");
+		}
+		Matcher matcher = ppimPattern.matcher(fileContent);
 		while (matcher.find()) {
 			String allADTexts = matcher.group(1);
 			adlist = getADlist(allADTexts + "<!--");
