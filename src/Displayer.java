@@ -61,9 +61,10 @@ public class Displayer {
 		String basepath = "/home/ben/Develop/spider/";
 //		String file = "html/haerbin/0_20181217a_1545008406917.html";
 //		String file = "20181213p_.html";
-		String file = "html/hefei/0_20181219a_1545185188303.origin.html";
+//		String file = "html/hefei/0_20181219a_1545185188303.origin.html";
+		String file = "html/beijing/1_20181219a_1545185157206.html";
 		try {
-			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING, "20181213p");
+			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING, "20181219a");
 			for (AD ad : adlist) {
 				simpleDisplay(ad);
 			}
@@ -74,7 +75,7 @@ public class Displayer {
 	
 	public static void test2() {
 		try {
-			displayAtACityAndOnADate(City.HEFEI, "20181219a");
+			displayAtACityAndOnADate(City.BEIJING, "20181219a");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,9 +96,9 @@ public class Displayer {
 	}
 
 	public static void main(String[] args) {
-//		test1();
+		test1();
 //		test2();
-		test3();
+//		test3();
 	}
 
 }
