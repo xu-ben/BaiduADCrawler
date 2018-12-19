@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ public class Displayer {
 	}
 
 	public static void fullDisplay(AD ad) {
+		System.out.println("////////////////////////////////////////");
 		System.out.println("rank:\t" + ad.getRank());
 		System.out.println("title:\t" + ad.getTitle());
 		System.out.println("org:\t" + ad.getOrganization());
@@ -24,8 +26,6 @@ public class Displayer {
 		System.out.println("access location:\t" + ad.getCity());
 		System.out.println("access date:\t" + ad.getAccessDatestr());
 		System.out.println("access timestamp:\t" + ad.getTimestamp());
-		System.out.println();
-		System.out.println();
 	}
 
 	
@@ -43,16 +43,45 @@ public class Displayer {
 		}
 	}
 	
+	
+	/**
+	 * 把某个时间，指定城市的结果输出
+	 * @param city
+	 * @param datestr
+	 * @throws IOException 
+	 */
+	public static void displayAtACityAndOnADate(City city, String datestr) throws IOException {
+		for (KeyWords key : KeyWords.values()) {
+			System.out.println("////////////////////////////////////////////////////////////////////////////////");
+			System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
+			ArrayList<AD> adlist = Parser.parseResultInBase(city, datestr, key);
+			if (adlist != null) {
+				for (AD ad : adlist) {
+					fullDisplay(ad);
+				}
+			} else {
+				System.out.println("no ADs found");
+			}
+			System.out.println("////////////////////////////////////////////////////////////////////////////////\n\n");
+		}
+	}
 
 	public static void test2() {
 		try {
-			ArrayList<AD> adlist = Parser.parseResultInBase(City.KUNMING, "20181219a", KeyWords.FENGXIONG);
-			if (adlist == null) {
-				System.out.println("no ADs found");
-				return;
-			}
-			for (AD ad : adlist) {
-				fullDisplay(ad);
+			displayAtACityAndOnADate(City.HANGZHOU, "20181219a");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void test3() {
+		try {
+			for (City city : City.values()) {
+				try {
+					displayAtACityAndOnADate(city, "20181219a");
+				} catch (FileNotFoundException e) {
+					System.out.println("no result file found");
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -61,7 +90,8 @@ public class Displayer {
 
 	public static void main(String[] args) {
 //		test1();
-		test2();
+//		test2();
+		test3();
 	}
 
 }
