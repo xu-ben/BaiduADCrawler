@@ -174,8 +174,8 @@ public class Parser {
 		}
 		return -1;
 	}
-
-	public static ArrayList<AD> parseResultInBase(City city, String datestr, KeyWords key) throws IOException {
+	
+	public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWords key) throws IOException {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		long timestamp = getTimestampOfResultFile(city, datestr, key);
 		if (timestamp < 0) {
@@ -190,9 +190,9 @@ public class Parser {
 		filePath.append('_');
 		filePath.append(timestamp);
 		filePath.append(".html");
-//		System.out.println(filePath);
+		// System.out.println(filePath);
 		ArrayList<AD> adlist = parseResultFile(filePath.toString());
-		fillField(adlist, city, timestamp, datestr); 
+		fillField(adlist, city, timestamp, datestr);
 		return adlist;
 	}
 	
@@ -221,15 +221,8 @@ public class Parser {
 	}
 
 	public static ArrayList<AD> parseAFile(String filePath, City accessCity, String datestr) throws IOException {
-		if (filePath == null || filePath.trim().equals("")) {
-			throw new FileNotFoundException("filePath required");
-		}
-		File targetFile = new File(filePath);
-		if (!targetFile.exists() || !targetFile.isFile()) {
-			throw new FileNotFoundException();
-		}
-		ArrayList<AD> adlist = new Parser(targetFile).runParser();
-		fillField(adlist, accessCity, -1, datestr); 
+		ArrayList<AD> adlist = parseResultFile(filePath);
+		fillField(adlist, accessCity, -1, datestr);
 		return adlist;
 	}
 	

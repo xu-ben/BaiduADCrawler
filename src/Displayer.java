@@ -39,7 +39,7 @@ public class Displayer {
 		for (KeyWords key : KeyWords.values()) {
 			System.out.println("////////////////////////////////////////////////////////////////////////////////");
 			System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
-			ArrayList<AD> adlist = Parser.parseResultInBase(city, datestr, key);
+			ArrayList<AD> adlist = Parser.findAndParseAResultInBase(city, datestr, key);
 			if (adlist != null) {
 				for (AD ad : adlist) {
 					fullDisplay(ad);
