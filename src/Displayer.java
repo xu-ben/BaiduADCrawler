@@ -30,7 +30,7 @@ public class Displayer {
 
 	
 	/**
-	 * 把某个时间，指定城市的结果输出
+	 * 把某个时间，指定城市的搜索结果输出
 	 * @param city
 	 * @param datestr
 	 * @throws IOException 
@@ -39,13 +39,18 @@ public class Displayer {
 		for (KeyWords key : KeyWords.values()) {
 			System.out.println("////////////////////////////////////////////////////////////////////////////////");
 			System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
-			ArrayList<AD> adlist = Parser.findAndParseAResultInBase(city, datestr, key);
-			if (adlist != null) {
-				for (AD ad : adlist) {
-					fullDisplay(ad);
-				}
+			ArrayList<AD> adlist = new ArrayList<>();
+			String filePath = Parser.findAndParseAResultInBase(city, datestr, key, adlist);
+			if (filePath == null) {
+				System.out.println("no this result file");
 			} else {
-				System.out.println("no ADs found");
+				if (adlist.size() > 0) {
+					for (AD ad : adlist) {
+						fullDisplay(ad);
+					}
+				} else {
+					System.out.println("no ADs in this file");
+				}
 			}
 			System.out.println("////////////////////////////////////////////////////////////////////////////////\n\n");
 		}

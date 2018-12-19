@@ -175,11 +175,34 @@ public class Parser {
 		return -1;
 	}
 	
+	/**
+	 * 
+	 * @param city
+	 * @param datestr
+	 * @param key
+	 * @return 返回解析得到的所有广告
+	 * @throws IOException
+	 */
 	public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWords key) throws IOException {
+		ArrayList<AD> adlist = new ArrayList<AD>();
+		findAndParseAResultInBase(city, datestr, key, adlist);
+		return adlist;
+	}
+
+	/**
+	 * 
+	 * @param city
+	 * @param datestr
+	 * @param key
+	 * @param adlist 解析的结果将会被add到此list中
+	 * @return 如何文件存在，返回文件全路径字符串，否则返回null
+	 * @throws IOException
+	 */
+	public static String findAndParseAResultInBase(City city, String datestr, KeyWords key, ArrayList<AD> adlist) throws IOException {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		long timestamp = getTimestampOfResultFile(city, datestr, key);
 		if (timestamp < 0) {
-			throw new FileNotFoundException();
+			return null;
 		}
 		StringBuilder filePath = new StringBuilder(basePath);
 		filePath.append(city.name().toLowerCase());
@@ -190,10 +213,16 @@ public class Parser {
 		filePath.append('_');
 		filePath.append(timestamp);
 		filePath.append(".html");
+		String pathstr = filePath.toString();
 		// System.out.println(filePath);
-		ArrayList<AD> adlist = parseResultFile(filePath.toString());
-		fillField(adlist, city, timestamp, datestr);
-		return adlist;
+		try {
+			ArrayList<AD> results = parseResultFile(pathstr);
+			fillField(results, city, timestamp, datestr);
+			adlist.addAll(results);// results一定不会是null
+			return pathstr;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
 	}
 	
 	private static ArrayList<AD> parseResultFile(String filePath) throws IOException {
