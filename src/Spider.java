@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Spider {
@@ -54,6 +55,31 @@ public class Spider {
 		} else {
 			return datestr + "a";
 		}
+	}
+	
+	public boolean crawlExcludeSomeCity(City[] cities, String datestr) {
+		boolean success = true;
+		for (City city : City.values()) {
+			boolean excluded = false;
+			for (City c : cities) {
+				if (c == city) {
+					excluded = true;
+					break;
+				}
+			}
+			if (excluded) {
+				continue;
+			}
+			if (!city.isUseProxy() || city.getCitycode() > 0) {
+				try {
+					success &= this.crawl(city, datestr);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
+		}
+		return success;
 	}
 	
 	public boolean crawlSomeCity(City[] cities, String datestr) {
@@ -138,9 +164,6 @@ public class Spider {
 //		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
 //		complement();
 //		test();
-
-		Spider spider = new Spider();
-		spider.crawlAllCity("20181220a");
 
 	}
 

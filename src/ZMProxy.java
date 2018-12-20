@@ -2,27 +2,29 @@ import java.io.IOException;
 
 public class ZMProxy {
 
-	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
+	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
-	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
+	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
 	public static String fetchProxyFromServer(City city) throws IOException {
-		return fetchProxyFromServer(FREE_URL, city);
+		return fetchProxyFromServer(FREE_URL, city, 3);
 	}
 
 	public String fetchProxyFromServer2(City city) throws IOException {
-		return fetchProxyFromServer(FIVE_URL, city);
+		return fetchProxyFromServer(FIVE_URL, city, 3);
 	}
 
-	private static String fetchProxyFromServer(String baseurl, City city) throws IOException {
+	private static String fetchProxyFromServer(String baseurl, City city, int mosttry) throws IOException {
 		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
 		String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
-		for (int i = 0; i < 5; i++) { // 最多尝试5次
+		for (int i = 0; i < mosttry; i++) { // 最多尝试mosttry次
 			System.err.println(cmd);
 			String proxy = Commons.execCmdInDir(cmd, ".", 5);
-			if (proxy.matches("\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+")) {
+			if (proxy.matches("\\s*\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+\\s*")) {
 				System.err.println(proxy);
-				return proxy;
+				return proxy.trim();
+			} else {
+				System.err.println(proxy);
 			}
 			try {
 				Thread.sleep(2000);
@@ -57,9 +59,6 @@ public class ZMProxy {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static void main(String[] args) {
 		try {
 			// System.out.println(Commons.execCmdInDir("ping www.baidu.com",
 			// ".", 10));
@@ -68,6 +67,10 @@ public class ZMProxy {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+		
 	}
 
 }
