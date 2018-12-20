@@ -3,8 +3,6 @@ import java.util.Date;
 
 public class Spider {
 
-	private String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
-
 	private String bdurl = "https://www.baidu.com/s?ie=utf-8&wd=";
 
 	private void crawlPageToFile(String cityname, String date, String proxy, KeyWords key) {
@@ -16,10 +14,11 @@ public class Spider {
 		}
 		long time = System.currentTimeMillis();
 		final String basestr = "curl -A \"%s\" %s \"%s%s\" > %d_%s_%d.html";
-		String cmd = String.format(basestr, userAgent, proxy, bdurl, key.getStr(), key.ordinal(), date, time);
+		String agent = Commons.chromeUserAgent;
+		String cmd = String.format(basestr, agent, proxy, bdurl, key.getStr(), key.ordinal(), date, time);
 		System.err.println(cmd);
 		try {
-			String ret = Commons.ExecCmdInDir(cmd, rootdir);
+			String ret = Commons.execCmdInDir(cmd, rootdir, 5);
 			if (ret != null && !ret.trim().equals("")) {
 				System.err.println(ret);
 			}
@@ -29,28 +28,9 @@ public class Spider {
 	}
 	
 	
-	private static String FREE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
-	
-	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=3&regions=";
-	
-	public String getProxyStr(City city) throws IOException {
-		String rootdir = "/home/ben/Develop/spider/html";
-		String baseurl = FREE_URL;
-//		String baseurl = FIVE_URL;
-		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
-		String cmd = String.format("curl -A \"%s\" \"%s\"", userAgent, url);
-		System.err.println(cmd);
-		String ip = Commons.ExecCmdInDir(cmd, rootdir).trim();
-		System.err.println(ip);
-		if (!ip.matches("\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+")) {
-			return null;
-		}
-		return ip;
-	}
-
 	public boolean crawl(City city, String date) throws IOException {
 		System.err.println(city.name().toLowerCase());
-		String proxy = city.isUseProxy() ? getProxyStr(city) : null;
+		String proxy = city.isUseProxy() ? ZMProxy.fetchProxyFromServer(city) : null;
 		boolean ret = false;
 		if (!city.isUseProxy() || proxy != null) {
 			String citystr = city.name().toLowerCase();
@@ -58,6 +38,8 @@ public class Spider {
 				crawlPageToFile(citystr, date, proxy, key);
 			}
 			ret = true;
+		} else {
+			System.err.println("get IP proxy error!");
 		}
 		System.err.println();
 		return ret;
@@ -153,15 +135,12 @@ public class Spider {
 //		System.err.println(crawlAllCityAt(2018, 12, 18, 15, 3));
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 15, 3));
-		complement();
-
+//		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
+//		complement();
 //		test();
-//		Spider spider = new Spider();
-//		Date date = new Date(System.currentTimeMillis());
-//		System.out.println(spider.getDatestr(date));
-//		spider.getProxyStr(City.GUANGZHOU);
-//		spider.crawl(City.SHANGHAI, "20181214p");
-		// spider.crawl(City.BEIJING.name().toLowerCase(), "20181214p");
+
+		Spider spider = new Spider();
+		spider.crawlAllCity("20181220a");
 
 	}
 
