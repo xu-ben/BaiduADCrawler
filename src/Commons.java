@@ -41,7 +41,7 @@ public class Commons {
 	}
 
 	/**
-	 * 在当前目录(".")下，阻塞式执行cmd命令，返回命令在stdout中的输出内容
+	 * 在当前目录(".")下，阻塞式执行cmd命令，返回命令在stdout中的输出内容, 如果没有输出，则为""，不会为null
 	 * @param cmd
 	 * @return
 	 * @throws IOException
@@ -55,7 +55,7 @@ public class Commons {
 	 * @param cmd
 	 * @param dir
 	 * @param timeout 单位为秒
-	 * @return 所执行的命令在stdout中输出的内容
+	 * @return 所执行的命令在stdout中输出的内容, 如果没有输出，则为""，不会为null
 	 * @throws IOException
 	 */
 	public static String execCmdInDir(String cmd, String dir, int timeout) throws IOException {
