@@ -10,7 +10,7 @@ public class ZMProxy {
 		return fetchProxyFromServer(FREE_URL, city, 3);
 	}
 
-	public String fetchProxyFromServer2(City city) throws IOException {
+	public static String fetchProxyFromServer2(City city) throws IOException {
 		return fetchProxyFromServer(FIVE_URL, city, 3);
 	}
 
