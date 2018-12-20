@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Commons {
+	
+	public static String chromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
+
 	public static String getTextFromFile(File f) throws IOException {
 		int len = (int) f.length();
 		FileInputStream fis = new FileInputStream(f);
@@ -43,7 +46,7 @@ public class Commons {
 		}
 		File d = new File(dir);
 		if (!d.exists() || !d.isDirectory()) {
-			throw new IOException("not dir");
+			throw new FileNotFoundException("not dir");
 		}
 		String[] cmds = { "/bin/sh", "-c", "" };
 		cmds[2] = cmd;
