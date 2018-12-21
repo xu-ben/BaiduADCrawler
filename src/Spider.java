@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class Spider {
@@ -30,6 +29,7 @@ public class Spider {
 	
 	
 	public boolean crawl(City city, String date) throws IOException {
+		System.err.println("////////////////////////////////////////////////////////////////////////////////");
 		System.err.println(city.name().toLowerCase());
 		String proxy = city.isUseProxy() ? ZMProxy.fetchProxyFromServer(city) : null;
 		boolean ret = false;
@@ -151,10 +151,12 @@ public class Spider {
 	}
 	
 	public static void complement() {
-		String datestr = "20181219p";
+		String datestr = "20181221p";
 		Spider spider = new Spider();
-		City[] cities = {City.SHENYANG, City.HAERBIN};
+		City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
 		spider.crawlSomeCity(cities, datestr);
+//		City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.ZHENGZHOU, City.NANJING};
+//		spider.crawlExcludeSomeCity(cities, datestr);
 	}
 
 	public static void main(String[] args) {
@@ -162,7 +164,9 @@ public class Spider {
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 15, 3));
 //		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
-//		complement();
+//		System.err.println(crawlAllCityAt(2018, 12, 21, 10, 4));
+//		System.err.println(crawlAllCityAt(2018, 12, 21, 15, 53));
+		complement();
 //		test();
 
 	}
