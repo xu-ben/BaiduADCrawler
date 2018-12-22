@@ -93,6 +93,8 @@ public class Displayer {
 
     private static void cleanprint(String str) {
         String cs = str.replaceAll(",", "，");
+        cs = cs.replaceAll("\"", "“");
+        cs = cs.replaceAll(" ", "");
         out.print(cs);
         out.print(',');
     }
@@ -111,30 +113,34 @@ public class Displayer {
         out.print('\n');
     }
 
-    private static void displayToCSV(ADsInAFile result) {
+    private static void displayToCSV(City city, ADsInAFile result) {
         ArrayList<AD> adlist = result.getAdlist();
         if (adlist != null && adlist.size() > 0) {
             for (AD ad : adlist) {
                 myprint(result.getKeyword().getStr());
+                myprint(city.name().toLowerCase());
                 myprint(ad.getAccessDatestr());
                 myprint(ad.getRank());
                 cleanprint(ad.getTitle());
                 cleanprint(ad.getOrganization());
                 myprint(ad.getDateInPage());
                 cleanprint(ad.getContext());
-                myprint(ad.getUrl());
+                cleanprint(ad.getUrl());
+//                cleanprint(ad.getUrl().replaceAll("\"", ""));
                 myprintln();
             }
         } else {
             myprint(result.getKeyword().getStr());
+            myprint(city.name().toLowerCase());
             myprint(result.getDatestr());
-            myprint("没有广告,,,,,,");
+            myprint("没有广告,,,,,");
             myprintln();
         }
     }
 
     public static void displayAllDataToCSV(City[] cities) throws IOException {
-        out = new PrintStream(new File("./test.csv"));
+//        out = System.out;
+        out = new PrintStream(new File("./data.csv"));
         myprint("关键词");
         myprint("搜索地点");
         myprint("搜索日期");
@@ -155,7 +161,7 @@ public class Displayer {
     public static void displayAllToCSV(City city) throws IOException {
 //        out = System.out;
         if (out == null) {
-            out = new PrintStream(new File("./test.csv"));
+            out = new PrintStream(new File("./data.csv"));
         }
         for (KeyWord key : KeyWord.values()) {
             ADsInAFile[] parseResults = Parser.findAndParseResultsInACity(city, key);
@@ -163,7 +169,7 @@ public class Displayer {
                 continue;
             }
             for (ADsInAFile result : parseResults) {
-                displayToCSV(result);
+                displayToCSV(city, result);
             }
             myprint(",,,,,,,,");
             myprintln();

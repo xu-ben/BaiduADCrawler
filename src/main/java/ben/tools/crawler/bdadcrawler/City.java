@@ -38,6 +38,25 @@ public enum City {
 		this.useProxy = useProxy;
 	}
 
+	public static City[] getAllCitiesExclude(City[] cities) {
+		City[] all = City.values();
+	    if (cities == null || cities.length == 0) {
+	        return all;
+		}
+		City[] ret = new City[all.length - cities.length];
+	    for (int i = 0, I = 0; i < all.length; i++) {
+	        int j = 0;
+	        for (; j < cities.length; j++) {
+	            if (all[i] == cities[j]) {
+	                break;
+				}
+			}
+			if (j == cities.length) {
+				ret[I++] = all[i];
+			}
+		}
+		return ret;
+	}
 
 	public int getProcode() {
 		return procode;
