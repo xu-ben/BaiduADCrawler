@@ -1,7 +1,9 @@
 package ben.tools.crawler.bdadcrawler;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Displayer {
@@ -65,7 +67,7 @@ public class Displayer {
         for (KeyWord key : KeyWord.values()) {
             ADsInAFile[] parseResults = Parser.findAndParseResultsInACity(city, key);
             if (parseResults == null) {
-                return ;
+                return;
             }
             for (ADsInAFile result : parseResults) {
                 System.out.println("////////////////////////////////////////////////////////////////////////////////");
@@ -84,6 +86,64 @@ public class Displayer {
             }
             System.out.println("\n\n\n");
             System.out.println("\n\n\n");
+        }
+    }
+
+    private static PrintStream out;
+
+    private static void cleanprint(String str) {
+        String cs = str.replaceAll(",", "，");
+        out.print(cs);
+        out.print(',');
+    }
+
+    private static void myprint(String str) {
+        out.print(str);
+        out.print(',');
+    }
+
+    private static void myprint(int i) {
+        Integer ii = i;
+        myprint(ii.toString());
+    }
+
+    private static void myprintln() {
+        out.print('\n');
+    }
+
+    public static void displayAllToCSV(City city) throws IOException {
+//        out = System.out;
+        out = new PrintStream(new File("./test.csv"));
+        for (KeyWord key : KeyWord.values()) {
+            ADsInAFile[] parseResults = Parser.findAndParseResultsInACity(city, key);
+            if (parseResults == null) {
+                return;
+            }
+            for (ADsInAFile result : parseResults) {
+                ArrayList<AD> adlist = result.getAdlist();
+                if (adlist != null && adlist.size() > 0) {
+                    for (AD ad : adlist) {
+                        myprint(key.getStr());
+                        myprint(ad.getAccessDatestr());
+                        myprint(ad.getRank());
+                        cleanprint(ad.getTitle());
+                        cleanprint(ad.getOrganization());
+                        myprint(ad.getDateInPage());
+                        myprint(ad.getUrl());
+                        cleanprint(ad.getContext());
+                        myprintln();
+                    }
+                } else {
+                    myprint(key.getStr());
+                    myprint(result.getDatestr());
+                    myprint("没有广告,,,,,");
+                    myprintln();
+                }
+            }
+            myprint(",,,,,,,");
+            myprintln();
+            myprint(",,,,,,,");
+            myprintln();
         }
     }
 
