@@ -3,8 +3,8 @@ package ben.tools.crawler.bdadcrawler;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,114 +20,68 @@ public class NewParser {
         this.targetFile = targetFile;
     }
 
-    private Pattern urlPattern = Pattern.compile("data-landurl=[\"]([^\"]+)[\"]");
 
-    private void parseURL(AD ad, StringBuilder urlText) {
-        Matcher m = urlPattern.matcher(urlText);
-        StringBuilder urlsb = new StringBuilder();
-        while (m.find()) {
-            urlsb.append(m.group(1));
-        }
-        ad.setUrl(urlsb.toString());
-//		System.err.println(urlsb);
-    }
-
-
-    // 一般顔色是＃CC0000
-    private Pattern textPattern = Pattern.compile("((?<=>)[^<>]+)|(<font[^>]+>([^<>]+)</font>)");
-
-    private StringBuilder getTextFromFontHtml(StringBuilder html) {
-        Matcher m = textPattern.matcher(html);
-        StringBuilder text = new StringBuilder();
-        while (m.find()) {
-            if (m.group(1) != null) {
-                text.append(m.group(1));
-            }
-            if (m.group(3) != null) {
-                text.append(m.group(3));
+    private void parseTitlePart(AD ad, Element div) {
+        // 正常里面就是一个h3标签, 但是这里先不用这个
+        String titleText = div.text();
+        ad.setTitle(titleText == null ? null : titleText.trim());
+//        System.err.println(div.text());
+        Elements links = div.getElementsByTag("a");
+        for (Element link : links) {
+//            String linkHref = link.attr("href");
+            String linkHref = link.attr("data-landurl");
+//            String linkText = link.text();
+//            System.out.println(linkHref);
+            if (linkHref != null && linkHref.trim().length() > 0) {// TODO
+                ad.setUrl(linkHref);
             }
         }
-        return text;
     }
 
-    public StringBuilder getHtmlContextInALabel(String html) {
-        Matcher matcher = aLabelPattern.matcher(html);
-        StringBuilder context = new StringBuilder();
-        while (matcher.find()) {
-            context.append(matcher.group(2));
+    private void parseBodyPart(AD ad, Element div) {
+        /**
+         * 这个div下正常是一个div，再之前是两个div，其中第一个是放图片，第二个是其它
+          */
+        Element bodydiv = div.children().get(0).children().get(1);
+
+        /**
+         * 这个div之下是多个div，一般最后一个是放机构和日期的，其它的是内容
+          */
+        Elements divs = bodydiv.children();
+        int size = divs.size();
+        StringBuilder bodyText = new StringBuilder();
+        for (int i = 0; i < size - 1; i++) {
+            Element e = divs.get(i);
+//            System.out.println("@@@:\ttype:" + e.tagName() + "\tid:" + e.id() + "\tclassName:" + e.className());
+//            if (i > 0) {
+//                bodyText.append('\n');
+//            }
+            bodyText.append(e.text());
         }
-        return context;
+//        System.err.println(bodyText);
+        ad.setContext(bodyText.toString());
+
+        /**
+         * 一般这个div之下的第一个子节点就是一个a标签，用它就行
+          */
+        Element orgdiv = divs.get(size - 1);
+        Element alabel = orgdiv.children().get(0); // TODO 加强健壮性
+
+        // a标签里面是两个span，分别放机构名称和日期
+        Elements spans = alabel.children();
+        ad.setOrganization(spans.get(0).text());
+        ad.setDateInPage(spans.get(1).text());
     }
 
-    public StringBuilder getTextInALabel(String html) {
-        Matcher matcher = aLabelPattern.matcher(html);
-        StringBuilder context = new StringBuilder();
-        while (matcher.find()) {
-            context.append(matcher.group(2));
-        }
-        return getTextFromFontHtml(context);
-    }
-
-    // a标签的内容里可能有引号，但标签属性里的字符串中不含有<>
-    private Pattern aLabelPattern = Pattern.compile("<a([^>]+)(>.+?<)/a>");
-
-    // a标签属性里的字符串中可能含有<>，但标签的内容里没有引号的情况
-    private Pattern aLabelPattern2 = Pattern.compile("<a (.+?)(>[^\"]+<)/a>");
-
-    //	private Pattern aLabelPattern = Pattern
-//			.compile("<a([^>]+)>((([^<>]+)|(<font color=#CC0000>[^<>]+</font>))+)</a>");
-    private void parseContentInH3(AD ad, String h3) {
-//		System.err.println(h3);
-//		System.err.println();
-        Matcher mh3 = aLabelPattern.matcher(h3);
-        StringBuilder titleHtml = new StringBuilder();
-        StringBuilder urlText = new StringBuilder();
-        while (mh3.find()) {
-            urlText.append(mh3.group(1));
-            titleHtml.append(mh3.group(2));
-        }
-        StringBuilder titleText = getTextFromFontHtml(titleHtml);
-        ad.setTitle(titleText == null ? null : titleText.toString());
-        // System.out.println(titleHtml);
-        parseURL(ad, urlText);
-    }
-
-
-    private void parseBody(AD ad, String body) {
-//		System.out.println(body);
-        StringBuilder bodyText = getTextInALabel(body);
-        ad.setContext(bodyText == null ? null : bodyText.toString());
-    }
-
-    private Pattern h3Pattern = Pattern.compile("<h3[^>]*>(.+?)</h3>");
-    private Pattern orgPattern = Pattern.compile("<span[^<>]+>([^<>]+)</span>[^<>]*<span[^<>]+>([^<>]+)</span>");
-    private Pattern bodyPattern = Pattern.compile("<div class=\"\">(.+?)</div>");
 
     public AD parseAAd(Element addiv) {
         AD ad = new AD();
-        System.out.println(addiv.outerHtml());
-        System.exit(0);
-//        Matcher h3m = h3Pattern.matcher(text);
-//        if (h3m.find()) {
-//            String h3 = h3m.group(1);
-//            parseContentInH3(ad, h3);
-//        }
-//        Matcher orgm = orgPattern.matcher(text);
-//        if (orgm.find()) {
-//            String org = orgm.group(1);
-//            if (org != null) {
-//                ad.setOrganization(org);
-//            }
-//            String dateInPage = orgm.group(2);
-//            if (dateInPage != null) {
-//                ad.setDateInPage(dateInPage);
-//            }
-//        }
-//        Matcher bodym = bodyPattern.matcher(text);
-//        if (bodym.find()) {
-//            String body = bodym.group(1);
-//            parseBody(ad, body);
-//        }
+        // 前两个child是两个div，分别是title和body部分，其余的不用管
+        Elements titleAndBody = addiv.children();
+        Element titleDiv = titleAndBody.get(0);
+        parseTitlePart(ad, titleDiv);
+        Element bodyDiv = titleAndBody.get(1);
+        parseBodyPart(ad, bodyDiv);
         return ad;
     }
 
