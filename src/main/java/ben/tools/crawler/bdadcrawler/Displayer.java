@@ -60,6 +60,10 @@ public class Displayer {
         }
     }
 
+    public static void displayAllNormally(City city) throws IOException {
+
+    }
+
     public static void displayNormally(String datestr) throws IOException {
         for (City city : City.values()) {
             try {

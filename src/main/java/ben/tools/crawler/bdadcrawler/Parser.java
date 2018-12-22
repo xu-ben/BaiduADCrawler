@@ -17,6 +17,8 @@ public class Parser {
 
     private File targetFile;
 
+    private static String basePath = "/home/ben/Develop/spider/html/";
+
     private Parser(File targetFile) {
         this.targetFile = targetFile;
     }
@@ -155,7 +157,6 @@ public class Parser {
 
 
     public static long getTimestampOfResultFile(City city, String datestr, KeyWords key) throws FileNotFoundException {
-        final String basePath = "/home/ben/Develop/spider/html/";
         String dirPath = basePath + city.name().toLowerCase();
 //		System.err.println(dirPath);
         File dir = new File(dirPath);
@@ -188,6 +189,7 @@ public class Parser {
         return adlist;
     }
 
+
     /**
      * @param city
      * @param datestr
@@ -197,7 +199,6 @@ public class Parser {
      * @throws IOException
      */
     public static String findAndParseAResultInBase(City city, String datestr, KeyWords key, ArrayList<AD> adlist) throws IOException {
-        final String basePath = "/home/ben/Develop/spider/html/";
         long timestamp = getTimestampOfResultFile(city, datestr, key);
         if (timestamp < 0) {
             return null;
