@@ -1,4 +1,7 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.tools.crawler;
+
+import ben.tools.crawler.bdadcrawler.City;
+import ben.tools.crawler.bdadcrawler.Commons;
 
 import java.io.IOException;
 

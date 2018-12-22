@@ -1,5 +1,7 @@
 package ben.tools.crawler.bdadcrawler;
 
+import ben.tools.crawler.ZMProxy;
+
 import java.io.IOException;
 import java.util.Date;
 
