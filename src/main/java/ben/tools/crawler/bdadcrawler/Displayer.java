@@ -1,8 +1,5 @@
 package ben.tools.crawler.bdadcrawler;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +65,8 @@ public class Displayer {
 //		String file = "html/haerbin/0_20181217a_1545008406917.html";
 //		String file = "20181213p_.html";
 //		String file = "html/hefei/0_20181219a_1545185188303.origin.html";
-		String file = "html/beijing/1_20181219a_1545185157206.html";
+//		String file = "html/beijing/1_20181219a_1545185157206.html";
+		String file = "html/beijing/0_20181219a_1545185155911.html";
 		try {
 			ArrayList<AD> adlist = Parser.parseAFile(basepath + file, City.BEIJING, "20181219a");
 			for (AD ad : adlist) {
@@ -81,7 +79,7 @@ public class Displayer {
 	
 	public static void test2() {
 		try {
-			displayAtACityAndOnADate(City.BEIJING, "20181219a");
+			displayAtACityAndOnADate(City.BEIJING, "20181221p");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -102,15 +100,15 @@ public class Displayer {
 	}
 
 	public static void main(String[] args) {
-		try {
-			Document doc = Jsoup.connect("http://www.gov.cn").get();
-			System.out.println(			doc.outerHtml());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Document doc = Jsoup.connect("http://www.gov.cn").get();
+//			System.out.println(			doc.outerHtml());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 //		test1();
 //		test2();
-//		test3();
+		test3();
 	}
 
 }

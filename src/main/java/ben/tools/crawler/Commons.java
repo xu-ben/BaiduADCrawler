@@ -1,4 +1,4 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.tools.crawler;
 
 import java.io.BufferedReader;
 import java.io.File;

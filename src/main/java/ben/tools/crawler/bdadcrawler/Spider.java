@@ -1,5 +1,6 @@
 package ben.tools.crawler.bdadcrawler;
 
+import ben.tools.crawler.Commons;
 import ben.tools.crawler.ZMProxy;
 
 import java.io.IOException;
