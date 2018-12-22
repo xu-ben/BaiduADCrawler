@@ -89,7 +89,7 @@ public class Displayer {
         }
     }
 
-    private static PrintStream out;
+    private static PrintStream out = null;
 
     private static void cleanprint(String str) {
         String cs = str.replaceAll(",", "，");
@@ -111,40 +111,65 @@ public class Displayer {
         out.print('\n');
     }
 
+    private static void displayToCSV(ADsInAFile result) {
+        ArrayList<AD> adlist = result.getAdlist();
+        if (adlist != null && adlist.size() > 0) {
+            for (AD ad : adlist) {
+                myprint(result.getKeyword().getStr());
+                myprint(ad.getAccessDatestr());
+                myprint(ad.getRank());
+                cleanprint(ad.getTitle());
+                cleanprint(ad.getOrganization());
+                myprint(ad.getDateInPage());
+                cleanprint(ad.getContext());
+                myprint(ad.getUrl());
+                myprintln();
+            }
+        } else {
+            myprint(result.getKeyword().getStr());
+            myprint(result.getDatestr());
+            myprint("没有广告,,,,,,");
+            myprintln();
+        }
+    }
+
+    public static void displayAllDataToCSV(City[] cities) throws IOException {
+        out = new PrintStream(new File("./test.csv"));
+        myprint("关键词");
+        myprint("搜索地点");
+        myprint("搜索日期");
+        myprint("广告的排名");
+        myprint("标题");
+        myprint("机构");
+        myprint("广告页面上的日期");
+        myprint("广告内容");
+        myprint("链接地址");
+        myprintln();
+        for (City city : cities) {
+            displayAllToCSV(city);
+            myprint(",,,,,,,,");
+            myprintln();
+        }
+    }
+
     public static void displayAllToCSV(City city) throws IOException {
 //        out = System.out;
-        out = new PrintStream(new File("./test.csv"));
+        if (out == null) {
+            out = new PrintStream(new File("./test.csv"));
+        }
         for (KeyWord key : KeyWord.values()) {
             ADsInAFile[] parseResults = Parser.findAndParseResultsInACity(city, key);
             if (parseResults == null) {
-                return;
+                continue;
             }
             for (ADsInAFile result : parseResults) {
-                ArrayList<AD> adlist = result.getAdlist();
-                if (adlist != null && adlist.size() > 0) {
-                    for (AD ad : adlist) {
-                        myprint(key.getStr());
-                        myprint(ad.getAccessDatestr());
-                        myprint(ad.getRank());
-                        cleanprint(ad.getTitle());
-                        cleanprint(ad.getOrganization());
-                        myprint(ad.getDateInPage());
-                        myprint(ad.getUrl());
-                        cleanprint(ad.getContext());
-                        myprintln();
-                    }
-                } else {
-                    myprint(key.getStr());
-                    myprint(result.getDatestr());
-                    myprint("没有广告,,,,,");
-                    myprintln();
-                }
+                displayToCSV(result);
             }
-            myprint(",,,,,,,");
-            myprintln();
-            myprint(",,,,,,,");
+            myprint(",,,,,,,,");
             myprintln();
         }
+        myprint(",,,,,,,,");
+        myprintln();
     }
 
     public static void displayNormally(String datestr) throws IOException {
