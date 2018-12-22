@@ -1,3 +1,6 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +42,7 @@ public class Displayer {
 		for (KeyWords key : KeyWords.values()) {
 			System.out.println("////////////////////////////////////////////////////////////////////////////////");
 			System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
-			ArrayList<AD> adlist = new ArrayList<>();
+			ArrayList<AD> adlist = new ArrayList<AD>();
 			String filePath = Parser.findAndParseAResultInBase(city, datestr, key, adlist);
 			if (filePath == null) {
 				System.out.println("no this result file");
@@ -97,8 +100,14 @@ public class Displayer {
 	}
 
 	public static void main(String[] args) {
+		try {
+			Document doc = Jsoup.connect("http://www.gov.cn").get();
+			System.out.println(			doc.outerHtml());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 //		test1();
-		test2();
+//		test2();
 //		test3();
 	}
 

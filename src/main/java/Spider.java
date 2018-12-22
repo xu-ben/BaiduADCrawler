@@ -166,8 +166,7 @@ public class Spider {
 //		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
 //		System.err.println(crawlAllCityAt(2018, 12, 21, 10, 4));
 //		System.err.println(crawlAllCityAt(2018, 12, 21, 15, 53));
-		System.err.println(crawlAllCityAt(2018, 12, 22, 10, 5));
-//		complement();
+		complement();
 //		test();
 
 	}
