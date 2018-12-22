@@ -3,7 +3,6 @@ package ben.tools.crawler.bdadcrawler;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,19 +37,31 @@ public class NewParser {
         }
     }
 
-    private void parseBodyPart(AD ad, Element div) {
+    /**
+     *
+     * @param ad
+     * @param div
+     * @param uselastdiv 只能取0或1，0表示org信息div不在此div内，1表示在
+     * @throws IOException
+     */
+    private void parseBodyPart(AD ad, Element div, int uselastdiv) throws IOException {
         /**
-         * 这个div下正常是一个div，再之前是两个div，其中第一个是放图片，第二个是其它
+         * 这个div下正常是两个div，其中第一个是放图片，第二个是其它, 如果只有一个div，那说明没有图片
           */
-        Element bodydiv = div.children().get(0).children().get(1);
+        Elements children = div.children();
+        if (children.size() < 1) {
+            // todo error;
+            throw new IOException("");
+        }
+        Element bodydiv = children.get(children.size() - 1);
 
         /**
-         * 这个div之下是多个div，一般最后一个是放机构和日期的，其它的是内容
+         * 这个div之下是多个div，如果uselastdiv＝1, 说明最后一个是放机构和日期的，其它的是内容
           */
         Elements divs = bodydiv.children();
         int size = divs.size();
         StringBuilder bodyText = new StringBuilder();
-        for (int i = 0; i < size - 1; i++) {
+        for (int i = 0; i < size - uselastdiv; i++) {
             Element e = divs.get(i);
 //            System.out.println("@@@:\ttype:" + e.tagName() + "\tid:" + e.id() + "\tclassName:" + e.className());
 //            if (i > 0) {
@@ -61,27 +72,42 @@ public class NewParser {
 //        System.err.println(bodyText);
         ad.setContext(bodyText.toString());
 
-        /**
-         * 一般这个div之下的第一个子节点就是一个a标签，用它就行
-          */
-        Element orgdiv = divs.get(size - 1);
-        Element alabel = orgdiv.children().get(0); // TODO 加强健壮性
+        if (uselastdiv == 1) {
+            parseBottomPart(ad, divs.get(size - 1));
+        }
 
+    }
+
+    private void parseBottomPart(AD ad, Element div) {
+        Element alabel = div.children().get(0); // TODO 加强健壮性
         // a标签里面是两个span，分别放机构名称和日期
         Elements spans = alabel.children();
         ad.setOrganization(spans.get(0).text());
         ad.setDateInPage(spans.get(1).text());
     }
 
+    private boolean ifContainBottom(String text) {
+        return (text.indexOf("广告") >= 0 && text.indexOf("评价") >= 0);
+    }
 
-    public AD parseAAd(Element addiv) {
+    public AD parseAAd(Element addiv) throws IOException {
         AD ad = new AD();
-        // 前两个child是两个div，分别是title和body部分，其余的不用管
-        Elements titleAndBody = addiv.children();
-        Element titleDiv = titleAndBody.get(0);
+        Elements children = addiv.children();
+
+        // 第一个div一定是放title的，毫无疑问
+        Element titleDiv = children.get(0);
         parseTitlePart(ad, titleDiv);
-        Element bodyDiv = titleAndBody.get(1);
-        parseBodyPart(ad, bodyDiv);
+
+//        parseBodyAndBottom(ad, bodyDiv);
+        // 之后分两种情况，一种是body和bottom合在一个div里，另一种是分开。
+        Element bodyDiv = children.get(1);
+        if (ifContainBottom(bodyDiv.text())) {
+            parseBodyPart(ad, bodyDiv.children().get(0), 1);
+        } else {
+            parseBodyPart(ad, bodyDiv, 0);
+            parseBottomPart(ad, children.get(2));
+        }
+        // 之后的div不用管
         return ad;
     }
 
