@@ -1,3 +1,5 @@
+package ben.tools.crawler.bdadcrawler;
+
 import java.io.IOException;
 import java.util.Date;
 

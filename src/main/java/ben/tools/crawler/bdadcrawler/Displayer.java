@@ -1,3 +1,5 @@
+package ben.tools.crawler.bdadcrawler;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
