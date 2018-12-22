@@ -1,8 +1,8 @@
 package ben.tools.crawler.bdadcrawler;
 
 public enum KeyWord {
-	FENGXIONG("丰胸"),
-	LONGXIONG("隆胸");
+	FENG_XIONG("丰胸"),
+	LONG_XIONG("隆胸");
 	
 	private String str;
 	
