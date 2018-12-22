@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,30 +39,29 @@ public class NewParser {
     }
 
     /**
-     *
      * @param ad
      * @param div
-     * @param uselastdiv 只能取0或1，0表示org信息div不在此div内，1表示在
+     * @param useLastDiv 只能取0或1，0表示org信息div不在此div内，1表示在
      * @throws IOException
      */
-    private void parseBodyPart(AD ad, Element div, int uselastdiv) throws IOException {
+    private void parseBodyPart(AD ad, Element div, int useLastDiv) throws IOException {
         /**
          * 这个div下正常是两个div，其中第一个是放图片，第二个是其它, 如果只有一个div，那说明没有图片
-          */
+         */
         Elements children = div.children();
         if (children.size() < 1) {
             // todo error;
             throw new IOException("");
         }
-        Element bodydiv = children.get(children.size() - 1);
+        Element bodyDiv = children.get(children.size() - 1);
 
         /**
          * 这个div之下是多个div，如果uselastdiv＝1, 说明最后一个是放机构和日期的，其它的是内容
-          */
-        Elements divs = bodydiv.children();
+         */
+        Elements divs = bodyDiv.children();
         int size = divs.size();
         StringBuilder bodyText = new StringBuilder();
-        for (int i = 0; i < size - uselastdiv; i++) {
+        for (int i = 0; i < size - useLastDiv; i++) {
             Element e = divs.get(i);
 //            System.out.println("@@@:\ttype:" + e.tagName() + "\tid:" + e.id() + "\tclassName:" + e.className());
 //            if (i > 0) {
@@ -72,7 +72,7 @@ public class NewParser {
 //        System.err.println(bodyText);
         ad.setContext(bodyText.toString());
 
-        if (uselastdiv == 1) {
+        if (useLastDiv == 1) {
             parseBottomPart(ad, divs.get(size - 1));
         }
 
@@ -111,6 +111,28 @@ public class NewParser {
         return ad;
     }
 
+
+    private Elements getADDivs(Elements divs) {
+        // TODO 优化判断逻辑 可以去看className，正常结果的className好像含有result字符串
+        Elements results = new Elements();
+        for (Element e : divs) {
+            if (e.id() != null && e.id().length() > 3) {
+                results.add(e);
+            }
+        }
+        if (results.size() >= 1) {
+            return results;
+        }
+        // 如果第一层中没有，则在第二层中找，不过只用看第一个大div
+        Elements children = divs.get(0).children();
+        for (Element e : children) {
+            if (e.id() != null && e.id().length() > 3) {
+                results.add(e);
+            }
+        }
+        return results;
+    }
+
     public ArrayList<AD> runParser() throws IOException {
         ArrayList<AD> adlist = new ArrayList<AD>();
         String fileContent = Commons.getTextFromFile(targetFile);
@@ -118,20 +140,14 @@ public class NewParser {
             throw new FileNotFoundException("this file is empty");
         }
         Document doc = Jsoup.parse(targetFile, "UTF-8");
-//        System.err.println(doc.outerHtml());
 //        Elements divs = doc.select("div#content_left");
-        Elements divs = doc.select("div#content_left").get(0).children();
-//        System.err.println(divs.outerHtml());
-//        Elements tmp = divs.select("div");
-        for (Element e : divs) {
-            // TODO 优化判断逻辑 可以去看className，正常结果的className好像含有result字符串
-            if (e.id() != null && e.id().length() > 3) {
-                AD ret = parseAAd(e);
-                if (ret != null) {
-                    adlist.add(ret);
-                }
-//                System.out.println("@@@:\ttype:" + e.tagName() + "\tid:" + e.id() + "\tclassName:" + e.className());
+        Elements addivs = getADDivs(doc.select("div#content_left").get(0).children());
+        for (Element e : addivs) {
+            AD ret = parseAAd(e);
+            if (ret != null) {
+                adlist.add(ret);
             }
+//            System.out.println("@@@:\ttype:" + e.tagName() + "\tid:" + e.id() + "\tclassName:" + e.className());
         }
         return adlist;
     }
