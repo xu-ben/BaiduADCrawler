@@ -216,6 +216,7 @@ public class Parser {
         ADsInAFile[] results = new ADsInAFile[fnsarr.length];
         for (int i = 0; i < fnsarr.length; i++) {
             FileNameStruct fns = fnsarr[i];
+            results[i] = new ADsInAFile();
             results[i].setFilePath(fns.filePath);
             results[i].setDatestr(fns.datestr);
             results[i].setKeyword(key);

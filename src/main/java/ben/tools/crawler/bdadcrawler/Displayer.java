@@ -62,6 +62,29 @@ public class Displayer {
     }
 
     public static void displayAllNormally(City city) throws IOException {
+//        for (KeyWord key : KeyWord.values()) {
+//
+//        }
+        KeyWord key = KeyWord.FENG_XIONG;
+        ADsInAFile[] parseResults = Parser.findAndParseResultsInACity(city, key);
+        if (parseResults == null) {
+            return ;
+        }
+        for (ADsInAFile result : parseResults) {
+            System.out.println("////////////////////////////////////////////////////////////////////////////////");
+            System.out.println("Date: " + result.getDatestr() + "\tKeyword: " + key.getStr());
+            ArrayList<AD> adlist = result.getAdlist();
+            String filePath = result.getFilePath();
+            System.out.println(filePath);
+            if (adlist != null && adlist.size() > 0) {
+                for (AD ad : adlist) {
+                    displayNormally(ad);
+                }
+            } else {
+                System.out.println("no ADs in this file");
+            }
+            System.out.println("////////////////////////////////////////////////////////////////////////////////\n\n");
+        }
 
     }
 
