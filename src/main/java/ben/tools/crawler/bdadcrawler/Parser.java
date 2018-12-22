@@ -176,19 +176,6 @@ public class Parser {
         return -1;
     }
 
-    /**
-     * @param city
-     * @param datestr
-     * @param key
-     * @return 返回解析得到的所有广告
-     * @throws IOException
-     */
-    public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
-        ArrayList<AD> adlist = new ArrayList<AD>();
-        findAndParseAResultInBase(city, datestr, key, adlist);
-        return adlist;
-    }
-
     public static String[] findAndParseAllInACity(City city, ArrayList<AD> adlist) throws IOException {
         return null;
     }
@@ -197,11 +184,9 @@ public class Parser {
      * @param city
      * @param datestr
      * @param key
-     * @param adlist  解析的结果将会被add到此list中
-     * @return 如何文件存在，返回文件全路径字符串，否则返回null
      * @throws IOException
      */
-    public static String findAndParseAResultInBase(City city, String datestr, KeyWord key, ArrayList<AD> adlist) throws IOException {
+    public static ADsInAFile findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
         long timestamp = getTimestampOfResultFile(city, datestr, key);
         if (timestamp < 0) {
             return null;
@@ -217,16 +202,18 @@ public class Parser {
         filePath.append(".html");
         String pathstr = filePath.toString();
         // System.out.println(filePath);
+        ADsInAFile result = new ADsInAFile();
+        result.setDatestr(datestr);
+        result.setKeyword(key);
         try {
-            ArrayList<AD> results = parseResultFile(pathstr);
-            fillField(results, city, timestamp, datestr);
-            if (results != null) {// result == null说明没有广告
-                adlist.addAll(results);
-            }
-            return pathstr;
+            ArrayList<AD> adlist = parseResultFile(pathstr);
+            fillField(adlist, city, timestamp, datestr);
+            result.setFilePath(pathstr);
+            result.setAdlist(adlist);
         } catch (FileNotFoundException e) {
-            return null;
+            result.setFilePath(null);
         }
+        return result;
     }
 
     private static ArrayList<AD> parseResultFile(String filePath) throws IOException {

@@ -42,13 +42,14 @@ public class Displayer {
         for (KeyWord key : KeyWord.values()) {
             System.out.println("////////////////////////////////////////////////////////////////////////////////");
             System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
-            ArrayList<AD> adlist = new ArrayList<AD>();
-            String filePath = Parser.findAndParseAResultInBase(city, datestr, key, adlist);
+            ADsInAFile parseRes = Parser.findAndParseAResultInBase(city, datestr, key);
+            ArrayList<AD> adlist = parseRes.getAdlist();
+            String filePath = parseRes.getFilePath();
             if (filePath == null) {
                 System.out.println("no this result file");
             } else {
                 System.out.println(filePath);
-                if (adlist.size() > 0) {
+                if (adlist != null && adlist.size() > 0) {
                     for (AD ad : adlist) {
                         displayNormally(ad);
                     }
