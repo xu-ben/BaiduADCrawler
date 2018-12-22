@@ -39,7 +39,7 @@ public class Displayer {
      * @throws IOException
      */
     public static void displayNormally(City city, String datestr) throws IOException {
-        for (KeyWords key : KeyWords.values()) {
+        for (KeyWord key : KeyWord.values()) {
             System.out.println("////////////////////////////////////////////////////////////////////////////////");
             System.out.println("City: " + city.name().toLowerCase() + "\tKeyword: " + key.getStr());
             ArrayList<AD> adlist = new ArrayList<AD>();

@@ -164,7 +164,7 @@ public class RegexParser {
 	}
 
 	
-	public static long getTimestampOfResultFile(City city, String datestr, KeyWords key) throws FileNotFoundException {
+	public static long getTimestampOfResultFile(City city, String datestr, KeyWord key) throws FileNotFoundException {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		String dirPath = basePath + city.name().toLowerCase();
 //		System.err.println(dirPath);
@@ -193,7 +193,7 @@ public class RegexParser {
 	 * @return 返回解析得到的所有广告
 	 * @throws IOException
 	 */
-	public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWords key) throws IOException {
+	public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
 		ArrayList<AD> adlist = new ArrayList<AD>();
 		findAndParseAResultInBase(city, datestr, key, adlist);
 		return adlist;
@@ -208,7 +208,7 @@ public class RegexParser {
 	 * @return 如何文件存在，返回文件全路径字符串，否则返回null
 	 * @throws IOException
 	 */
-	public static String findAndParseAResultInBase(City city, String datestr, KeyWords key, ArrayList<AD> adlist) throws IOException {
+	public static String findAndParseAResultInBase(City city, String datestr, KeyWord key, ArrayList<AD> adlist) throws IOException {
 		final String basePath = "/home/ben/Develop/spider/html/";
 		long timestamp = getTimestampOfResultFile(city, datestr, key);
 		if (timestamp < 0) {

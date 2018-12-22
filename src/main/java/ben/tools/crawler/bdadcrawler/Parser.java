@@ -156,7 +156,7 @@ public class Parser {
     }
 
 
-    public static long getTimestampOfResultFile(City city, String datestr, KeyWords key) throws FileNotFoundException {
+    public static long getTimestampOfResultFile(City city, String datestr, KeyWord key) throws FileNotFoundException {
         String dirPath = basePath + city.name().toLowerCase();
 //		System.err.println(dirPath);
         File dir = new File(dirPath);
@@ -183,12 +183,15 @@ public class Parser {
      * @return 返回解析得到的所有广告
      * @throws IOException
      */
-    public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWords key) throws IOException {
+    public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
         ArrayList<AD> adlist = new ArrayList<AD>();
         findAndParseAResultInBase(city, datestr, key, adlist);
         return adlist;
     }
 
+    public static String[] findAndParseAllInACity(City city, ArrayList<AD> adlist) throws IOException {
+        return null;
+    }
 
     /**
      * @param city
@@ -198,7 +201,7 @@ public class Parser {
      * @return 如何文件存在，返回文件全路径字符串，否则返回null
      * @throws IOException
      */
-    public static String findAndParseAResultInBase(City city, String datestr, KeyWords key, ArrayList<AD> adlist) throws IOException {
+    public static String findAndParseAResultInBase(City city, String datestr, KeyWord key, ArrayList<AD> adlist) throws IOException {
         long timestamp = getTimestampOfResultFile(city, datestr, key);
         if (timestamp < 0) {
             return null;

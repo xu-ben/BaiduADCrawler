@@ -4,13 +4,12 @@ import ben.tools.crawler.Commons;
 import ben.tools.crawler.ZMProxy;
 
 import java.io.IOException;
-import java.util.Date;
 
 public class Spider {
 
 	private String bdurl = "https://www.baidu.com/s?ie=utf-8&wd=";
 
-	private void crawlPageToFile(String cityname, String date, String proxy, KeyWords key) {
+	private void crawlPageToFile(String cityname, String date, String proxy, KeyWord key) {
 		String rootdir = String.format("/home/ben/Develop/spider/html/%s", cityname);
 		if (proxy == null) {
 			proxy = "";
@@ -40,7 +39,7 @@ public class Spider {
 		boolean ret = false;
 		if (!city.isUseProxy() || proxy != null) {
 			String citystr = city.name().toLowerCase();
-			for (KeyWords key : KeyWords.values()) {
+			for (KeyWord key : KeyWord.values()) {
 				crawlPageToFile(citystr, date, proxy, key);
 			}
 			ret = true;
