@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -187,6 +188,7 @@ public class Parser {
             throw new FileNotFoundException();
         }
         String[] fileNameList = dir.list();
+        Arrays.sort(fileNameList);
         Pattern p = Pattern.compile(key.ordinal() + "_(\\d+\\w)_(\\d+)\\.html");
         ArrayList<FileNameStruct> fnslist = new ArrayList<>();
         for (String fileName : fileNameList) {
@@ -208,7 +210,6 @@ public class Parser {
     }
 
     public static ADsInAFile[] findAndParseResultsInACity(City city, KeyWord key) throws IOException {
-        // todo 确认一下这样是否是按日期排好序的
         FileNameStruct[] fnsarr = getFileNameStructArr(city, key);
         if (fnsarr == null) {
             return null;
