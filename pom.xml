@@ -8,6 +8,10 @@
     <artifactId>bdadcrawler</artifactId>
     <version>1.0</version>
 
+    <properties>
+        <java-version>1.8</java-version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -22,9 +26,26 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <java-version>1.8</java-version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <developers>
+        <developer>
+            <id>xu.ben</id>
+            <name>xu-ben</name>
+            <timezone>8</timezone>
+        </developer>
+    </developers>
 </project>
