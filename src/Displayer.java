@@ -44,6 +44,7 @@ public class Displayer {
 			if (filePath == null) {
 				System.out.println("no this result file");
 			} else {
+				System.out.println(filePath);
 				if (adlist.size() > 0) {
 					for (AD ad : adlist) {
 						fullDisplay(ad);
@@ -85,7 +86,7 @@ public class Displayer {
 		try {
 			for (City city : City.values()) {
 				try {
-					displayAtACityAndOnADate(city, "20181219a");
+					displayAtACityAndOnADate(city, "20181219p");
 				} catch (FileNotFoundException e) {
 					System.out.println("no result file found");
 				}
@@ -96,8 +97,8 @@ public class Displayer {
 	}
 
 	public static void main(String[] args) {
-		test1();
-//		test2();
+//		test1();
+		test2();
 //		test3();
 	}
 

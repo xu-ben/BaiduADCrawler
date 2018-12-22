@@ -70,7 +70,7 @@ public class Parser {
 	private void parseContentInH3(AD ad, String h3) {
 //		System.err.println(h3);
 //		System.err.println();
-		Matcher mh3 = aLabelPattern2.matcher(h3);
+		Matcher mh3 = aLabelPattern.matcher(h3);
 		StringBuilder titleHtml = new StringBuilder();
 		StringBuilder urlText = new StringBuilder();
 		while (mh3.find()) {
@@ -137,7 +137,9 @@ public class Parser {
 		return adlist;
 	}
 
-	private Pattern ppimPattern = Pattern.compile("<!-- new ppim -->([^\r\n]+)\n");
+	// 更好的办法 <div class="zACHih" style="display:block !important;visibility:visible !important" data-pos="12"></div>
+	private Pattern ppimPattern = Pattern.compile("<!-- new pp[^-]* -->([^\r\n]+)\n");
+	
 
 	public ArrayList<AD> runParser() throws IOException {
 		ArrayList<AD> adlist = null;
@@ -218,7 +220,9 @@ public class Parser {
 		try {
 			ArrayList<AD> results = parseResultFile(pathstr);
 			fillField(results, city, timestamp, datestr);
-			adlist.addAll(results);// results一定不会是null
+			if (results != null) {// result == null说明没有广告
+				adlist.addAll(results);
+			}
 			return pathstr;
 		} catch (FileNotFoundException e) {
 			return null;
