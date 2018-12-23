@@ -7,10 +7,19 @@ import java.io.IOException;
 
 public class Spider {
 
-	private String bdurl = "https://www.baidu.com/s?ie=utf-8&wd=";
+	private ZMProxy zmProxy = null;
+
+	private String dataDirPath = null;
+
+	public Spider(ZMProxy zmProxy, String dataDirPath) {
+		this.zmProxy = zmProxy;
+		this.dataDirPath = dataDirPath;
+	}
+
+	private static String bdurl = "https://www.baidu.com/s?ie=utf-8&wd=";
 
 	private void crawlPageToFile(String cityname, String date, String proxy, KeyWord key) {
-		String rootdir = String.format("/home/ben/Develop/spider/html/%s", cityname);
+		String rootdir = dataDirPath + "/" + cityname;
 		if (proxy == null) {
 			proxy = "";
 		} else {
@@ -35,7 +44,7 @@ public class Spider {
 	public boolean crawl(City city, String date) throws IOException {
 		System.err.println("////////////////////////////////////////////////////////////////////////////////");
 		System.err.println(city.name().toLowerCase());
-		String proxy = city.isUseProxy() ? ZMProxy.fetchProxyFromServer(city) : null;
+		String proxy = city.isUseProxy() ? zmProxy.fetchProxyFromServer(city) : null;
 		boolean ret = false;
 		if (!city.isUseProxy() || proxy != null) {
 			String citystr = city.name().toLowerCase();

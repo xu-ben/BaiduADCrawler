@@ -7,6 +7,12 @@ import java.io.IOException;
 
 public class ZMProxy {
 
+	private boolean useFreeApi = true;
+
+	public ZMProxy(boolean useFreeApi) {
+		this.useFreeApi = useFreeApi;
+	}
+
 	/**
 	 * 调用芝麻代理api返回的结果
 	 */
@@ -20,21 +26,21 @@ public class ZMProxy {
 
 	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
-	public static String fetchProxyFromServer(City city) throws IOException {
-		return fetchProxyFromServer(FREE_URL, city, 3);
+	public String fetchProxyFromServer(City city) throws IOException {
+	    if (useFreeApi) {
+			return fetchProxyFromServer(FREE_URL, city, 3);
+		} else {
+			return fetchProxyFromServer(FIVE_URL, city, 3);
+		}
 	}
 
-	public static String fetchProxyFromServer2(City city) throws IOException {
-		return fetchProxyFromServer(FIVE_URL, city, 3);
-	}
-
-	private static String fetchProxyFromServer(String baseurl, City city, int mosttry) throws IOException {
+	private String fetchProxyFromServer(String baseurl, City city, int mosttry) throws IOException {
 		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
 		String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
 		for (int i = 0; i < mosttry; i++) { // 最多尝试mosttry次
 			System.err.println(cmd);
 			String proxy = Commons.execCmdInDir(cmd, ".", 15);
-			if (proxy.charAt(0) == '{') {
+			if (proxy.length() > 0 && proxy.charAt(0) == '{') {
 				Gson gson = new Gson();
 				Result res = gson.fromJson(proxy, Result.class);
 				System.out.println(res.msg);
@@ -57,7 +63,7 @@ public class ZMProxy {
 		return null;
 	}
 
-	public static void fetchAllProxysAndPrint() throws IOException {
+	public void fetchAllProxysAndPrint() throws IOException {
 		City[] cities = City.values();
 		String[] res = new String[cities.length];
 		for (int i = 0; i < cities.length; i++) {
@@ -75,7 +81,7 @@ public class ZMProxy {
 		}
 	}
 
-	public static void test() {
+	public void test() {
 		try {
 			fetchProxyFromServer(City.CHANGSHA);
 		} catch (IOException e) {

@@ -1,9 +1,20 @@
 package ben.tools.crawler.bdadcrawler;
 
+import ben.tools.crawler.ZMProxy;
+
 import java.io.IOException;
 import java.util.Date;
 
 public class Scheduler {
+
+    private ZMProxy zmProxy = null;
+
+    private String dataDirPath = null;
+
+    public Scheduler(ZMProxy zmProxy, String dataDirPath) {
+        this.zmProxy = zmProxy;
+        this.dataDirPath = dataDirPath;
+    }
 
     @SuppressWarnings("deprecation")
     private static String getDatestr(Date date) {
@@ -24,7 +35,7 @@ public class Scheduler {
     }
 
     private boolean crawl(City city, String datestr) throws IOException {
-        return new Spider().crawl(city, datestr);
+        return new Spider(this.zmProxy, this.dataDirPath).crawl(city, datestr);
     }
 
     public boolean crawlAllCity(String datestr) throws IOException {
@@ -71,8 +82,10 @@ public class Scheduler {
     }
 
     public static void test() {
+        String rootdir = "/home/ben/Develop/spider/html";
+        ZMProxy zmProxy = new ZMProxy(true);
         String datestr = "20181218a";
-        Scheduler scheduler = new Scheduler();
+        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
         try {
             scheduler.crawlAllCity(datestr);
         } catch (IOException e) {
@@ -80,26 +93,33 @@ public class Scheduler {
         }
     }
 
-    public static void complement() {
-        String datestr = "20181222p";
-        Scheduler scheduler = new Scheduler();
+    public static void complement(ZMProxy zmProxy, String rootdir) {
+        String datestr = "20181223p";
+        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
         try {
 //            City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
 //            scheduler.crawlSomeCity(cities, datestr);
-            City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.ZHENGZHOU, City.NANJING, City.HAERBIN};
+            City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
             scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
         } catch (IOException e) {
         }
     }
 
     public static void main(String[] args) {
+		String rootdir = "/home/ben/Develop/spider/html";
+        ZMProxy zmProxy = new ZMProxy(true);
+        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
 //		System.err.println(crawlAllCityAt(2018, 12, 18, 15, 3));
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
 //		System.err.println(crawlAllCityAt(2018, 12, 19, 15, 3));
 //		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
 //		System.err.println(crawlAllCityAt(2018, 12, 21, 10, 4));
-//		System.err.println(crawlAllCityAt(2018, 12, 22, 18, 6));
-        complement();
+//        try {
+//            System.err.println(scheduler.crawlAllCityAt(2018, 12, 23, 20, 34));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        complement(zmProxy, rootdir);
 //		test();
 
     }
