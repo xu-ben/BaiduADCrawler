@@ -59,8 +59,13 @@ public class Parser {
         Element bodyDiv = children.get(children.size() - 1);
 
         /**
-         * 这个div之下是多个div，如果uselastdiv＝1, 说明最后一个是放机构和日期的，其它的是内容
+         * 如果这个div之下是多个div: 如果uselastdiv＝1, 说明最后一个是放机构和日期的，其它的是内容
+         * 如果这个div之下没有div了，则说明他本身就是全部内容
          */
+        if (useLastDiv == 0) { // 这种写法是为了方便
+            ad.setContext(bodyDiv.text().trim());
+            return;
+        }
         Elements divs = bodyDiv.children();
         int size = divs.size();
         StringBuilder bodyText = new StringBuilder();

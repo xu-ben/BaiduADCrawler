@@ -1,6 +1,7 @@
 package ben.tools.crawler.bdadcrawler;
 
 import org.junit.Test;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class ParticularFileTest {
 
     @Test
     public void test2() throws IOException {
-		String file = "html/beijing/1_20181219a_1545185157206.html";
+        String file = "html/beijing/1_20181219a_1545185157206.html";
 //		String file = "html/beijing/0_20181219a_1545185155911.html";
         ArrayList<AD> adlist = Parser.parseAFile(basePath + file, City.BEIJING, "20181219a");
         for (AD ad : adlist) {
@@ -37,7 +38,7 @@ public class ParticularFileTest {
     }
 
     @Test
-    public void test3() throws IOException { // todo
+    public void test3() throws IOException {
         String file = "html/hefei/0_20181219a_1545185188303.origin.html";
         ArrayList<AD> adlist = Parser.parseAFile(basePath + file, City.HEFEI, "20181219a");
         for (AD ad : adlist) {
@@ -45,7 +46,14 @@ public class ParticularFileTest {
         }
     }
 
-    //todo
-//    String file = "html/beijing/0_20181214p_1544790833628.html"; 4, body
+    @Test
+    public void test4() throws IOException {
+        String file = "html/beijing/0_20181214p_1544790833628.html";
+        ArrayList<AD> adlist = Parser.parseAFile(basePath + file, City.BEIJING, "20181214p");
+        System.err.println(basePath + file);
+        for (AD ad : adlist) {
+            Displayer.displaySimply(ad);
+        }
+    }
 
 }
