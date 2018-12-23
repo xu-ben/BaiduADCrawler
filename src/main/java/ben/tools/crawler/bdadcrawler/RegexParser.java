@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,9 @@ import java.util.regex.Pattern;
 public class RegexParser {
 
 	private File targetFile;
-	
+
+	private static String basePath = "/home/ben/Develop/spider/html/";
+
 	private RegexParser(File targetFile) {
 		this.targetFile = targetFile;
 	}
@@ -163,9 +166,9 @@ public class RegexParser {
 		return adlist;
 	}
 
-	
-	public static long getTimestampOfResultFile(City city, String datestr, KeyWord key) throws FileNotFoundException {
-		final String basePath = "/home/ben/Develop/spider/html/";
+	public static FileNameStruct getAFileNameStruct(City city, String datestr, KeyWord key) throws FileNotFoundException {
+		FileNameStruct fns = new FileNameStruct();
+		fns.datestr = datestr;
 		String dirPath = basePath + city.name().toLowerCase();
 //		System.err.println(dirPath);
 		File dir = new File(dirPath);
@@ -177,66 +180,88 @@ public class RegexParser {
 		for (String fileName : fileNameList) {
 			Matcher m = p.matcher(fileName);
 			if (m.matches()) {
-				return Long.parseLong(m.group(1));
+				fns.timestamp = Long.parseLong(m.group(1));
+				fns.filePath = dirPath + "/" + fileName;
 //				System.err.println(m.group(1));
+//    			System.out.println(fileName);
+				break;
 			}
-//			System.out.println(fileName);
 		}
-		return -1;
+		return fns;
 	}
-	
-	/**
-	 * 
-	 * @param city
-	 * @param datestr
-	 * @param key
-	 * @return 返回解析得到的所有广告
-	 * @throws IOException
-	 */
-	public static ArrayList<AD> findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
-		ArrayList<AD> adlist = new ArrayList<AD>();
-		findAndParseAResultInBase(city, datestr, key, adlist);
-		return adlist;
+
+	public static FileNameStruct[] getFileNameStructArr(City city, KeyWord key) throws FileNotFoundException {
+		String dirPath = basePath + city.name().toLowerCase();
+//		System.err.println(dirPath);
+		File dir = new File(dirPath);
+		if (dir == null || !dir.exists() || !dir.isDirectory()) {
+			throw new FileNotFoundException();
+		}
+		String[] fileNameList = dir.list();
+		Arrays.sort(fileNameList);
+		Pattern p = Pattern.compile(key.ordinal() + "_(\\d+\\w)_(\\d+)\\.html");
+		ArrayList<FileNameStruct> fnslist = new ArrayList<>();
+		for (String fileName : fileNameList) {
+			Matcher m = p.matcher(fileName);
+			if (m.matches()) {
+				FileNameStruct fns = new FileNameStruct();
+				fns.datestr = m.group(1);
+				fns.timestamp = Long.parseLong(m.group(2));
+				fns.filePath = dirPath + "/" + fileName;
+				fnslist.add(fns);
+			}
+		}
+		if (fnslist.size() > 0) {
+			FileNameStruct[] ret = new FileNameStruct[fnslist.size()];
+			return fnslist.toArray(ret);
+		} else {
+			return null;
+		}
+	}
+
+	public static ADsInAFile[] findAndParseResultsInACity(City city, KeyWord key) throws IOException {
+		FileNameStruct[] fnsarr = getFileNameStructArr(city, key);
+		if (fnsarr == null) {
+			return null;
+		}
+		ADsInAFile[] results = new ADsInAFile[fnsarr.length];
+		for (int i = 0; i < fnsarr.length; i++) {
+			FileNameStruct fns = fnsarr[i];
+			results[i] = new ADsInAFile();
+			results[i].setFilePath(fns.filePath);
+			results[i].setDatestr(fns.datestr);
+			results[i].setKeyword(key);
+			ArrayList<AD> adlist = new RegexParser(new File(fns.filePath)).runParser();
+			fillField(adlist, city, fns.timestamp, fns.datestr);
+			results[i].setAdlist(adlist);
+		}
+		return results;
 	}
 
 	/**
-	 * 
 	 * @param city
 	 * @param datestr
 	 * @param key
-	 * @param adlist 解析的结果将会被add到此list中
-	 * @return 如何文件存在，返回文件全路径字符串，否则返回null
 	 * @throws IOException
 	 */
-	public static String findAndParseAResultInBase(City city, String datestr, KeyWord key, ArrayList<AD> adlist) throws IOException {
-		final String basePath = "/home/ben/Develop/spider/html/";
-		long timestamp = getTimestampOfResultFile(city, datestr, key);
+	public static ADsInAFile findAndParseAResultInBase(City city, String datestr, KeyWord key) throws IOException {
+		FileNameStruct fns = getAFileNameStruct(city, datestr, key);
+		long timestamp = fns.timestamp;
 		if (timestamp < 0) {
 			return null;
 		}
-		StringBuilder filePath = new StringBuilder(basePath);
-		filePath.append(city.name().toLowerCase());
-		filePath.append('/');
-		filePath.append(key.ordinal());
-		filePath.append('_');
-		filePath.append(datestr);
-		filePath.append('_');
-		filePath.append(timestamp);
-		filePath.append(".html");
-		String pathstr = filePath.toString();
-		// System.out.println(filePath);
-		try {
-			ArrayList<AD> results = parseResultFile(pathstr);
-			fillField(results, city, timestamp, datestr);
-			if (results != null) {// result == null说明没有广告
-				adlist.addAll(results);
-			}
-			return pathstr;
-		} catch (FileNotFoundException e) {
-			return null;
-		}
+		// System.out.println(fns.filePath);
+		ADsInAFile result = new ADsInAFile();
+		result.setDatestr(datestr);
+		result.setKeyword(key);
+		ArrayList<AD> adlist = new RegexParser(new File(fns.filePath)).runParser();
+		fillField(adlist, city, timestamp, datestr);
+		result.setFilePath(fns.filePath);
+		result.setAdlist(adlist);
+		return result;
 	}
-	
+
+
 	private static ArrayList<AD> parseResultFile(String filePath) throws IOException {
 		if (filePath == null || filePath.trim().equals("")) {
 			throw new FileNotFoundException("filePath error");
