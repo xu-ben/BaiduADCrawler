@@ -11,37 +11,6 @@ public class Commons {
 
 	public static String chromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
 
-	public static String getTextFromFile(File f) throws IOException {
-		int len = (int) f.length();
-		FileInputStream fis = new FileInputStream(f);
-		InputStreamReader isr = new InputStreamReader(fis, "utf-8");
-		String res = getTextFromStreamReader(isr, len);
-		isr.close();
-		return res;
-	}
-
-	public static String getTextFromStreamReader(InputStreamReader isr, int contentSize) throws IOException {
-		if (isr == null) {
-			System.err.println("null argument");
-			return null;
-		}
-		if (contentSize <= 0) {
-			return null;
-		}
-		BufferedReader br = new BufferedReader(isr);
-		char[] content = new char[contentSize];
-		int textLen = br.read(content);
-		br.close();
-		int offset = 0;
-		/*
-		 * 去掉BOM头无效字符
-		 */
-		if (65279 == (int) content[0]) {
-			offset = 1;
-		}
-		return String.valueOf(content, offset, textLen - offset);
-	}
-
 	/**
 	 * 在当前目录(".")下，阻塞式执行cmd命令，返回命令在stdout中的输出内容, 如果没有输出，则为""，不会为null
 	 * @param cmd

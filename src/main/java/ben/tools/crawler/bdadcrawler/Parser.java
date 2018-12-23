@@ -138,10 +138,10 @@ public class Parser {
 
     public ArrayList<AD> runParser() throws IOException {
         ArrayList<AD> adlist = new ArrayList<AD>();
-        String fileContent = Commons.getTextFromFile(targetFile);
-        if (fileContent == null || fileContent.trim().equals("")) {
-            throw new FileNotFoundException("this file is empty");
-        }
+//        String fileContent = Commons.getTextFromFile(targetFile);
+//        if (fileContent == null || fileContent.trim().equals("")) {
+//            throw new FileNotFoundException("this file is empty");
+//        }
         Document doc = Jsoup.parse(targetFile, "UTF-8");
 //        Elements divs = doc.select("div#content_left");
         Elements addivs = getADDivs(doc.select("div#content_left").get(0).children());

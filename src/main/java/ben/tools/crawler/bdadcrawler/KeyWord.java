@@ -6,7 +6,7 @@ public enum KeyWord {
 	
 	private String str;
 	
-	private KeyWord(String str) {
+	KeyWord(String str) {
 		this.str = str;
 	}
 
