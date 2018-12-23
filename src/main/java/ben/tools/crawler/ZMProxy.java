@@ -26,12 +26,33 @@ public class ZMProxy {
 
 	private static String FIVE_URL = "http://webapi.http.zhimacangku.com/getip?num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
+	private static String WHITE_LIST_URL = "http://web.http.cnapi.cc/index/index/save_white?neek=58877&appkey=f049b28d3e7e894ca570dfae321eb879&white=%s";
+
 	public String fetchProxyFromServer(City city) throws IOException {
 	    if (useFreeApi) {
 			return fetchProxyFromServer(FREE_URL, city, 3);
 		} else {
 			return fetchProxyFromServer(FIVE_URL, city, 3);
 		}
+	}
+
+	/**
+	 *
+	 * @param str
+	 * @return true如果可以再次尝试; false不用再试了
+	 */
+	private boolean treatResult(String str) {
+		Gson gson = new Gson();
+		Result res = gson.fromJson(str, Result.class);
+		System.out.println(res.msg);
+		if (res.msg.equals("您的该套餐已过期!")) {
+			return false;
+		}
+		if (res.msg.endsWith("设置为白名单！")) {
+			return true;
+        }
+		// todo 添加更多逻辑
+        return true;
 	}
 
 	private String fetchProxyFromServer(String baseurl, City city, int mosttry) throws IOException {
@@ -41,12 +62,8 @@ public class ZMProxy {
 			System.err.println(cmd);
 			String proxy = Commons.execCmdInDir(cmd, ".", 15);
 			if (proxy.length() > 0 && proxy.charAt(0) == '{') {
-				Gson gson = new Gson();
-				Result res = gson.fromJson(proxy, Result.class);
-				System.out.println(res.msg);
-				// todo 添加更多逻辑
-				if (res.msg.equals("您的该套餐已过期!")) {
-					return null;
+			    if (!treatResult(proxy)) {
+			    	return null;
 				}
 			} else if (proxy.matches("\\s*\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+\\s*")) {
 				System.err.println(proxy);
