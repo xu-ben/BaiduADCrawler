@@ -1,6 +1,6 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
-import ben.tools.crawler.ZMProxy;
+import ben.crawler.ZMProxy;
 
 import java.io.IOException;
 import java.util.Date;
@@ -94,13 +94,15 @@ public class Scheduler {
     }
 
     public static void complement(ZMProxy zmProxy, String rootdir) {
-        String datestr = "20181223p";
+        String datestr = "20181224a";
         Scheduler scheduler = new Scheduler(zmProxy, rootdir);
         try {
 //            City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
 //            scheduler.crawlSomeCity(cities, datestr);
-            City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
-            scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
+//            City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
+//            City[] cities = {City.BEIJING, City.SHENZHEN, City.HAERBIN};
+//            scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
+            scheduler.crawlSomeCity(new City[]{City.BEIJING}, datestr);
         } catch (IOException e) {
         }
     }

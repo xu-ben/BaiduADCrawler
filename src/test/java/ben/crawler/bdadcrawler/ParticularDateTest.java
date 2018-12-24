@@ -1,4 +1,4 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
 import org.junit.Test;
 import java.io.IOException;

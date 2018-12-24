@@ -1,8 +1,6 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
-import ben.tools.crawler.ZMProxy;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import ben.crawler.ZMProxy;
 import org.junit.Test;
 
 import java.io.IOException;

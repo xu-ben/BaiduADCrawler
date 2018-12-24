@@ -1,4 +1,4 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
 import java.io.File;
 import java.io.FileNotFoundException;

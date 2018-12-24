@@ -1,4 +1,4 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
 public enum City {
 	BEIJING(110000, 110105, false),

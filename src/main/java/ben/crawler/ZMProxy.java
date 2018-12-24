@@ -1,6 +1,6 @@
-package ben.tools.crawler;
+package ben.crawler;
 
-import ben.tools.crawler.bdadcrawler.City;
+import ben.crawler.bdadcrawler.City;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.regex.Matcher;

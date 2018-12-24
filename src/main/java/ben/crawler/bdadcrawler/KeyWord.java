@@ -1,4 +1,4 @@
-package ben.tools.crawler.bdadcrawler;
+package ben.crawler.bdadcrawler;
 
 public enum KeyWord {
 	FENG_XIONG("丰胸"),
