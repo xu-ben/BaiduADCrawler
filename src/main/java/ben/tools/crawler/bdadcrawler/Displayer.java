@@ -124,6 +124,9 @@ public class Displayer {
                 cleanprint(ad.getTitle());
                 cleanprint(ad.getOrganization());
                 myprint(ad.getDateInPage());
+                if (ad.getContext() == null || ad.getContext().isEmpty()) {
+                    System.err.println(ad.getTimestamp());
+                }
                 cleanprint(ad.getContext());
                 cleanprint(ad.getUrl());
 //                cleanprint(ad.getUrl().replaceAll("\"", ""));

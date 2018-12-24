@@ -143,13 +143,15 @@ public class Parser {
 
     public ArrayList<AD> runParser() throws IOException {
         ArrayList<AD> adlist = new ArrayList<AD>();
-//        String fileContent = Commons.getTextFromFile(targetFile);
-//        if (fileContent == null || fileContent.trim().equals("")) {
-//            throw new FileNotFoundException("this file is empty");
-//        }
+        if (targetFile.length() <= 0) {
+            throw new IOException("empty file : " + targetFile.getAbsolutePath());
+        }
         Document doc = Jsoup.parse(targetFile, "UTF-8");
-//        Elements divs = doc.select("div#content_left");
-        Elements addivs = getADDivs(doc.select("div#content_left").get(0).children());
+        Elements elements = doc.select("div#content_left");
+        if (elements.size() <= 0) {
+            throw new IOException("can't find content_left in: " + targetFile.getAbsolutePath());
+        }
+        Elements addivs = getADDivs(elements.get(0).children());
         for (Element e : addivs) {
             AD ret = parseAAd(e);
             if (ret != null) {
