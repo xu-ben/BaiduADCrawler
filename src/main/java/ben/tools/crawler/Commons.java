@@ -2,7 +2,6 @@ package ben.tools.crawler;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,7 +25,7 @@ public class Commons {
 	 * @param cmd
 	 * @param dir
 	 * @param timeout 单位为秒
-	 * @return 所执行的命令在stdout中输出的内容, 如果没有输出，则为""，不会为null
+	 * @return 所执行的命令在stdout中输出的内容, 如果没有输出，则为""，不会为null。如果命令执行因为超时被kill，则返回null
 	 * @throws IOException
 	 */
 	public static String execCmdInDir(String cmd, String dir, int timeout) throws IOException {
@@ -45,7 +44,9 @@ public class Commons {
 		if (timeout < 0) {
 			myExecSync(cmd, d, stdout, stderr);
 		} else {
-			myExecAsync(cmd, d, timeout, stdout, stderr);
+			if (!myExecAsync(cmd, d, timeout, stdout, stderr)) {
+				return null;
+			}
 		}
 		return stdout.toString();
 	}
@@ -63,7 +64,7 @@ public class Commons {
 		Process proc = null;
 		BufferedReader brout = null, brerr = null;
 		char[] buf = new char[512];
-		int len = 0;
+		int len;
 		try {
 			proc = Runtime.getRuntime().exec(cmds, null, dir);
 			brout = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -136,8 +137,8 @@ public class Commons {
 			e.printStackTrace();
 		} finally {
 			if (proc != null) {
-				proc.destroy(); //
-				proc = null;
+				proc.destroy();
+//				proc = null;
 			}
 			if (brout != null) {
 				brout.close();
