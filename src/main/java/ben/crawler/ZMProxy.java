@@ -3,10 +3,13 @@ package ben.crawler;
 import ben.crawler.bdadcrawler.City;
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ZMProxy {
+
+    private static Logger logger = Logger.getLogger(ZMProxy.class.getName());
 
 	private boolean useFreeApi;
 
@@ -47,7 +50,7 @@ public class ZMProxy {
 	private boolean treatResult(String str) throws IOException {
 		Gson gson = new Gson();
 		Result res = gson.fromJson(str, Result.class);
-		System.err.println(res.msg);
+		logger.info(res.msg);
 		if (res.msg.equals("您的该套餐已过期!")) {
 			return false;
 		}
@@ -59,7 +62,7 @@ public class ZMProxy {
 		    // todo
 		    String url = WHITE_LIST_BASE_URL + m.group(1);
 			String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
-			System.err.println(cmd);
+			logger.info(cmd);
 			String ret = Commons.execCmdInDir(cmd, ".", 15);
 			return false;
 		}
@@ -71,12 +74,12 @@ public class ZMProxy {
 		String url = String.format(baseurl, city.getProcode(), city.getCitycode());
 		String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
 		for (int i = 0; i < mosttry; i++) { // 最多尝试mosttry次
-			System.err.println(cmd);
+			logger.info(cmd);
 			String res = Commons.execCmdInDir(cmd, ".", 15);
 			if (res == null || res.length() == 0) { // null说明超时了, 为空也不正常
 				continue;
 			}
-			System.err.println(res);
+			logger.info(res);
 			if (res.charAt(0) == '{') {
 			    if (!treatResult(res)) {
 			    	return null;
@@ -109,26 +112,6 @@ public class ZMProxy {
 		for (int i = 0; i < cities.length; i++) {
 			System.out.println(cities[i].name() + "," + res[i]);
 		}
-	}
-
-	public void test() {
-		try {
-			fetchProxyFromServer(City.CHANGSHA);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			// System.out.println(Commons.execCmdInDir("ping www.baidu.com",
-			// ".", 10));
-			System.out.println(Commons.execCmdInDir("ls", ".", 10));
-			// fetchAllProxysAndPrint();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void main(String[] args) {
-		
 	}
 
 }

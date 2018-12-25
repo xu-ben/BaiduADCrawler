@@ -16,7 +16,7 @@ public enum City {
 	CHONGQING(500000, 500300),
 	KUNMING(530000, 530900),//用玉溪代替
 	SHENYANG(210000, 210100),
-	HAERBIN(230000, 230100);
+	HAERBIN(230000, -1);//230100 暂时没有ip了
 	
 
 	private int procode;

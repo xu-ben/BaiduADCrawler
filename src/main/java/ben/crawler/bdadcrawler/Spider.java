@@ -2,10 +2,12 @@ package ben.crawler.bdadcrawler;
 
 import ben.crawler.Commons;
 import ben.crawler.ZMProxy;
-
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class Spider {
+
+	private static Logger logger = Logger.getLogger(Spider.class.getName());
 
 	private ZMProxy zmProxy = null;
 
@@ -29,11 +31,11 @@ public class Spider {
 		final String basestr = "curl -A \"%s\" %s \"%s%s\" > %d_%s_%d.html";
 		String agent = Commons.chromeUserAgent;
 		String cmd = String.format(basestr, agent, proxy, bdurl, key.getStr(), key.ordinal(), date, time);
-		System.err.println(cmd);
+		logger.info(cmd);
 		try {
-			String ret = Commons.execCmdInDir(cmd, rootdir, 5);
+			String ret = Commons.execCmdInDir(cmd, rootdir, 10);
 			if (ret != null && !ret.trim().equals("")) {
-				System.err.println(ret);
+			    logger.info("result: " + ret);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,7 +45,7 @@ public class Spider {
 	
 	public boolean crawl(City city, String date) throws IOException {
 		System.err.println("////////////////////////////////////////////////////////////////////////////////");
-		System.err.println(city.name().toLowerCase());
+		System.err.println("////////////////////////////////////////" + city.name().toLowerCase());
 		String proxy = city.isUseProxy() ? zmProxy.fetchProxyFromServer(city) : null;
 		boolean ret = false;
 		if (!city.isUseProxy() || proxy != null) {
@@ -53,7 +55,7 @@ public class Spider {
 			}
 			ret = true;
 		} else {
-			System.err.println("get IP proxy error!");
+			logger.warning("get IP proxy error!");
 		}
 		System.err.println();
 		return ret;

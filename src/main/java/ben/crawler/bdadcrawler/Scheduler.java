@@ -4,8 +4,11 @@ import ben.crawler.ZMProxy;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Logger;
 
 public class Scheduler {
+
+    private static Logger logger = Logger.getLogger(Scheduler.class.getName());
 
     private ZMProxy zmProxy = null;
 
@@ -55,21 +58,21 @@ public class Scheduler {
         long datetime = date.getTime();
         long ct = System.currentTimeMillis();
 
-        long lognum = 0;
+        long cycles = 0;
         while ((ct = System.currentTimeMillis()) < datetime) {
             try {
                 if (Math.abs(ct - date.getTime()) < 5000) {
                     // TODO
-                    System.err.printf("datetime:%d,\t nowtime:%d,\t%s\n", datetime, ct, datestr);
+                    logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, datetime));
                     return this.crawlAllCity(datestr);
 //					return true;
                 } else {
-                    if (lognum % 100 == 0) {
-                        System.out.printf("nowtime:%s\n", new Date(ct).toString());
-                    } else if (lognum % 100 == 0) {
-                        System.out.printf("datetime:%s,\t nowtime:%s\n", new Date(datetime).toString(), new Date(ct).toString());
+                    if (cycles % 100 == 0) {
+                        logger.info(String.format("cycles: %d", cycles));
+                    } else if (cycles % 1000 == 0) {
+                        logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, datetime));
                     }
-                    lognum++;
+                    cycles++;
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
@@ -77,7 +80,7 @@ public class Scheduler {
                 return false;
             }
         }
-        System.out.println("here");
+        logger.severe("run to here...");
         return false;
     }
 
@@ -111,17 +114,18 @@ public class Scheduler {
 		String rootdir = "/home/ben/Develop/spider/html";
         ZMProxy zmProxy = new ZMProxy(true);
         Scheduler scheduler = new Scheduler(zmProxy, rootdir);
-//		System.err.println(crawlAllCityAt(2018, 12, 18, 15, 3));
-//		System.err.println(crawlAllCityAt(2018, 12, 19, 10, 6));
-//		System.err.println(crawlAllCityAt(2018, 12, 19, 15, 3));
-//		System.err.println(crawlAllCityAt(2018, 12, 20, 9, 2));
-//		System.err.println(crawlAllCityAt(2018, 12, 21, 10, 4));
-//        try {
-//            System.err.println(scheduler.crawlAllCityAt(2018, 12, 23, 20, 34));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        complement(zmProxy, rootdir);
+//		crawlAllCityAt(2018, 12, 18, 15, 3);
+//		crawlAllCityAt(2018, 12, 19, 10, 6);
+//		crawlAllCityAt(2018, 12, 19, 15, 3);
+//		crawlAllCityAt(2018, 12, 20, 9, 2);
+//		crawlAllCityAt(2018, 12, 21, 10, 4);
+//		crawlAllCityAt(2018, 12, 21, 10, 4);
+        try {
+            scheduler.crawlAllCityAt(2018, 12, 25, 16, 45);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        complement(zmProxy, rootdir);
 //		test();
 
     }
