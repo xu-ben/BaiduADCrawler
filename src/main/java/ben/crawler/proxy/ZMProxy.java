@@ -14,6 +14,7 @@ public class ZMProxy {
 
     private static Logger logger = Logger.getLogger(ZMProxy.class.getName());
 
+    // TODO 可以改为在构造方法里传参指定配置文件
     private static String appkey = ResourceBundle.getBundle("config").getString("zmproxy.appKey");
 
     private static String neek = ResourceBundle.getBundle("config").getString("zmproxy.neek");
@@ -29,6 +30,11 @@ public class ZMProxy {
     private static String ADD_WHITE_LIST = CN_API_BASE + "save_white" + "?neek=" + neek + "&appkey=" + appkey + "&white=";
 
     private static String DEL_WHITE_LIST = CN_API_BASE + "del_white" + "?neek=" + neek + "&appkey=" + appkey + "&white=";
+
+    /**
+     * 在芝麻代理的服务器上看到的本机的ip地址
+     */
+    private String hostRemoteIp;
 
     private boolean useFreeApi;
 
@@ -47,9 +53,9 @@ public class ZMProxy {
 
     public String fetchProxyFromServer(City city) throws IOException {
         if (useFreeApi) {
-            return fetchProxyFromServer(FREE_URL, city, 3);
+            return fetchProxyFromServer(FREE_URL, city, 2);
         } else {
-            return fetchProxyFromServer(FIVE_URL, city, 3);
+            return fetchProxyFromServer(FIVE_URL, city, 2);
         }
     }
 
@@ -61,22 +67,25 @@ public class ZMProxy {
      */
     private boolean treatResult(String str) throws IOException {
         Gson gson = new Gson();
+        // todo try catch JsonSyntaxException
         Result res = gson.fromJson(str, Result.class);
         logger.info(res.msg);
         if (res.msg.equals("您的该套餐已过期!")) {
+            throw new ArrearsException();
+        }
+        if (res.msg.equals("请更换条件再试!")) { // "code":115
+            // 目测是因为没有ip了，这个不用再试了, 否则会扣费，这是他们的bug
             return false;
         }
-        if (res.msg.equals("请更换条件再试!")) {
-            return true;
-        }
         Matcher m = pWhiteList.matcher(res.msg);
-        if (m.matches()) {
+        if (m.matches()) { // "code":113
+            hostRemoteIp = m.group(1);
+            String url = ADD_WHITE_LIST + hostRemoteIp;
             // todo
-            String url = ADD_WHITE_LIST + m.group(1);
             String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
             logger.info(cmd);
             String ret = Commons.execCmdInDir(cmd, ".", 15);
-            return false;
+            return true;
         }
         // todo 添加更多逻辑
         return true;
@@ -108,6 +117,7 @@ public class ZMProxy {
         return null;
     }
 
+    @Deprecated
     public void fetchAllProxysAndPrint() throws IOException {
         City[] cities = City.values();
         String[] res = new String[cities.length];
@@ -123,6 +133,20 @@ public class ZMProxy {
         System.out.println('\n');
         for (int i = 0; i < cities.length; i++) {
             System.out.println(cities[i].name() + "," + res[i]);
+        }
+    }
+
+    /**
+     * 使用完代理功能后，最好调一下此方法。方法内会执行将本机IP白名单删除等操作，确保账户安全
+     */
+    public void close() throws IOException {
+        if (hostRemoteIp != null) {
+            String url = DEL_WHITE_LIST + hostRemoteIp;
+            // todo
+            String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
+            logger.info(cmd);
+            String ret = Commons.execCmdInDir(cmd, ".", 15);
+//            删除成功会返回:{"code":0,"success":true,"msg":"删除成功","data":[]}
         }
     }
 
