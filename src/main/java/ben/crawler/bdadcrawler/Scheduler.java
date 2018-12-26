@@ -1,9 +1,11 @@
 package ben.crawler.bdadcrawler;
 
+import ben.crawler.proxy.ArrearsException;
 import ben.crawler.proxy.ZMProxy;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public class Scheduler {
@@ -19,20 +21,18 @@ public class Scheduler {
         this.dataDirPath = dataDirPath;
     }
 
-    @SuppressWarnings("deprecation")
-    private static String getDatestr(Date date) {
-        String datestr = String.format("%d%02d%02d", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
-        if (date.getHours() >= 12) {
-            return datestr + "p";
-        } else {
-            return datestr + "a";
-        }
+    private static String getDatestr(long timestamp) {
+//        String.format(Locale.US, "%1$tY%1$tm%1$td%1$tp", timestamp);
+        String str = String.format(Locale.US, "%1$tY%1$tm%1$td%1$tp", timestamp);
+        return str.substring(0, str.length() - 1); // todo 这样是显示a或p而不是am或pm，将来可改
     }
 
     public boolean crawlSomeCity(City[] cities, String datestr) throws IOException {
         boolean success = true;
         for (City city : cities) {
-            success &= this.crawl(city, datestr);
+            if (!city.isUseProxy() || city.getCitycode() > 0) {
+                success &= this.crawl(city, datestr);
+            }
         }
         return success;
     }
@@ -42,35 +42,27 @@ public class Scheduler {
     }
 
     public boolean crawlAllCity(String datestr) throws IOException {
-        boolean success = true;
-        for (City city : City.values()) {
-            if (!city.isUseProxy() || city.getCitycode() > 0) {
-                success &= this.crawl(city, datestr);
-            }
-        }
-        return success;
+        return crawlSomeCity(City.values(), datestr);
     }
 
-    public boolean crawlAllCityAt(int year, int month, int day, int hour, int minutes) throws IOException {
-        @SuppressWarnings("deprecation")
-        Date date = new Date(year - 1900, month - 1, day, hour, minutes, 0);
-        String datestr = getDatestr(date);
-        long datetime = date.getTime();
-        long ct = System.currentTimeMillis();
-
-        long cycles = 0;
-        while ((ct = System.currentTimeMillis()) < datetime) {
+    /**
+     * 在指定的时间执行爬虫
+     */
+    public boolean crawlAllCityAt(long dateTimestamp) throws IOException {
+        String datestr = getDatestr(dateTimestamp);
+        long ct, cycles = 0;
+        while ((ct = System.currentTimeMillis()) < dateTimestamp) {
             try {
-                if (Math.abs(ct - date.getTime()) < 5000) {
+                if (Math.abs(ct - dateTimestamp) < 5000) {
                     // TODO
-                    logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, datetime));
+                    logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, dateTimestamp));
                     return this.crawlAllCity(datestr);
-//					return true;
+//                    return true;
                 } else {
                     if (cycles % 100 == 0) {
                         logger.info(String.format("cycles: %d", cycles));
                     } else if (cycles % 1000 == 0) {
-                        logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, datetime));
+                        logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, dateTimestamp));
                     }
                     cycles++;
                     Thread.sleep(1000);
@@ -84,50 +76,44 @@ public class Scheduler {
         return false;
     }
 
-    public static void test() {
-        String rootdir = "/home/ben/Develop/spider/html";
-        ZMProxy zmProxy = new ZMProxy(true);
-        String datestr = "20181218a";
-        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
-        try {
-            scheduler.crawlAllCity(datestr);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    private static City[] getAllCitiesProxiable() {
+        final City[] cities = {City.BEIJING, City.SHENZHEN, City.HAERBIN};
+        final City[] results = City.getAllCitiesExclude(cities);
+        return results;
     }
 
-    public static void complement(ZMProxy zmProxy, String rootdir) {
-        String datestr = "20181224a";
-        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
-        try {
-//            City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
-//            scheduler.crawlSomeCity(cities, datestr);
-//            City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
-//            City[] cities = {City.BEIJING, City.SHENZHEN, City.HAERBIN};
-//            scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
-            scheduler.crawlSomeCity(new City[]{City.BEIJING}, datestr);
-        } catch (IOException e) {
-        }
+
+    public static void complement(Scheduler scheduler) throws IOException {
+        String datestr = "20181226a";
+//        City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
+//        scheduler.crawlSomeCity(cities, datestr);
+        City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
+        scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
+//        scheduler.crawlSomeCity(new City[]{City.BEIJING}, datestr);
+//        scheduler.crawlSomeCity(City.getAllCitiesExclude(new City[]{City.BEIJING}), datestr);
+//        scheduler.crawlSomeCity(getAllCitiesProxiable(), datestr);
     }
 
     public static void main(String[] args) {
-		String rootdir = "/home/ben/Develop/spider/html";
+        String rootdir = "/home/ben/Develop/spider/html";
         ZMProxy zmProxy = new ZMProxy(true);
-        Scheduler scheduler = new Scheduler(zmProxy, rootdir);
-//		crawlAllCityAt(2018, 12, 18, 15, 3);
-//		crawlAllCityAt(2018, 12, 19, 10, 6);
-//		crawlAllCityAt(2018, 12, 19, 15, 3);
-//		crawlAllCityAt(2018, 12, 20, 9, 2);
-//		crawlAllCityAt(2018, 12, 21, 10, 4);
-//		crawlAllCityAt(2018, 12, 21, 10, 4);
         try {
-            scheduler.crawlAllCityAt(2018, 12, 25, 16, 45);
+            Scheduler scheduler = new Scheduler(zmProxy, rootdir);
+            Calendar date = Calendar.getInstance();
+            date.set(2018, 12 - 1, 26, 16, 44, 0);
+            scheduler.crawlAllCityAt(date.getTimeInMillis());
+//            complement(scheduler);
+        } catch (ArrearsException ae) {
+            ae.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        complement(zmProxy, rootdir);
-//		test();
-
+        try {
+            zmProxy.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

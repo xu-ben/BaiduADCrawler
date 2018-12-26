@@ -26,13 +26,13 @@ public enum City {
 	// 意思是运行爬虫的机器就在此城市, 不必使用代理
 	private boolean useProxy; 
 
-	private City(int procode, int citycode) {
+	City(int procode, int citycode) {
 		this.procode = procode;
 		this.citycode = citycode;
 		this.useProxy = true;
 	}
 
-	private City(int procode, int citycode, boolean useProxy) {
+	City(int procode, int citycode, boolean useProxy) {
 		this.procode = procode;
 		this.citycode = citycode;
 		this.useProxy = useProxy;
