@@ -1,7 +1,7 @@
 package ben.crawler.bdadcrawler;
 
 import ben.crawler.Commons;
-import ben.crawler.ZMProxy;
+import ben.crawler.proxy.ZMProxy;
 import java.io.IOException;
 import java.util.logging.Logger;
 

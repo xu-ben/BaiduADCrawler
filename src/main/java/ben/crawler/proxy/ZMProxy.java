@@ -1,5 +1,6 @@
-package ben.crawler;
+package ben.crawler.proxy;
 
+import ben.crawler.Commons;
 import ben.crawler.bdadcrawler.City;
 import com.google.gson.Gson;
 
