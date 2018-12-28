@@ -1,0 +1,1 @@
+如果需要使用芝麻代理，需要在config.properties里加上appKey、neek和pack的值

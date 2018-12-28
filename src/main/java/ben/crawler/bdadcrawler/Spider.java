@@ -33,7 +33,7 @@ public class Spider {
 		String cmd = String.format(basestr, agent, proxy, bdurl, key.getStr(), key.ordinal(), date, time);
 		logger.info(cmd);
 		try {
-			String ret = Commons.execCmdInDir(cmd, rootdir, 10);
+			String ret = Commons.execCmdInDir(cmd, rootdir, 20);
 			if (ret != null && !ret.trim().equals("")) {
 			    logger.info("result: " + ret);
 			}

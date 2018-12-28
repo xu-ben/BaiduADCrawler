@@ -19,12 +19,15 @@ public class ZMProxy {
 
     private static String neek = ResourceBundle.getBundle("config").getString("zmproxy.neek");
 
+    private static String pack = ResourceBundle.getBundle("config").getString("zmproxy.pack");
+
     private static String CN_API_BASE = "http://web.http.cnapi.cc/index/index/";
 
     private static String GET_IP_BASE = "http://webapi.http.zhimacangku.com/getip?";
 
-    private static String FREE_URL = GET_IP_BASE + "num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=37000&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
+    private static String FREE_URL = GET_IP_BASE + "num=1&type=1&pro=%d&city=%d&yys=0&port=1&pack=" + pack + "&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
+    // TODO 账户字段是哪个?
     private static String FIVE_URL = GET_IP_BASE + "num=1&type=1&pro=%d&city=%d&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=4&sb=0&pb=4&mr=1&regions=";
 
     private static String ADD_WHITE_LIST = CN_API_BASE + "save_white" + "?neek=" + neek + "&appkey=" + appkey + "&white=";
