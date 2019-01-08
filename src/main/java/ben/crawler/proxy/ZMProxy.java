@@ -62,7 +62,12 @@ public class ZMProxy {
         }
     }
 
-    private static Pattern pWhiteList = Pattern.compile("请将(\\d+\\.\\d+\\.\\d+\\.\\d+)设置为白名单！");
+    /**
+     * 报文可能有多种形态，例如
+     * 1."您的套餐pack传参有误！请检测您现在的124.64.16.51是否在套餐所在用户的白名单中!"
+     * 2."请将124.64.16.51为白名单!"
+     */
+    private static Pattern pWhiteList = Pattern.compile(".*?(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).*白名单.*");
 
     /**
      * @param str
@@ -81,7 +86,7 @@ public class ZMProxy {
             return false;
         }
         Matcher m = pWhiteList.matcher(res.msg);
-        if (m.matches()) { // "code":113
+        if (m.matches()) { // "code":113, 115
             hostRemoteIp = m.group(1);
             String url = ADD_WHITE_LIST + hostRemoteIp;
             // todo
