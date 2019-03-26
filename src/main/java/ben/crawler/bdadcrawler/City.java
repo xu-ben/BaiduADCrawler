@@ -1,10 +1,10 @@
 package ben.crawler.bdadcrawler;
 
 public enum City {
-	BEIJING(true, true),
+	BEIJING(true),
 	SHANGHAI,
 	GUANGZHOU,
-	SHENZHEN(false, false),
+	SHENZHEN(),
 	ZHENGZHOU,
 	NANJING,
 	FUZHOU,
@@ -16,25 +16,24 @@ public enum City {
 	CHONGQING,
 	KUNMING,
 	SHENYANG,
-	HAERBIN(false, false);
+	HAERBIN();
 	
 
 	// 意思是运行爬虫的机器就在此城市, 不必使用代理
     private boolean isLocal;
 
-    // 目前可以拿到代理ip
-	private boolean proxiable;
-
 	City() {
 		this.isLocal = false;
-		this.proxiable = true;
 	}
 
-	City(boolean isLocal, boolean proxiable) {
+	City(boolean isLocal) {
 		this.isLocal = isLocal;
-		this.proxiable = proxiable;
 	}
 
+	/**
+	 * 可以通过各种代理网站拿到代理ip的城市
+	 * @return
+	 */
 	public static City[] getAllProxiableCities() {
 		final City[] cities = {City.SHENZHEN, City.HAERBIN};
 		return City.getAllCitiesExclude(cities);
@@ -62,10 +61,6 @@ public enum City {
 
 	public boolean isLocal() {
 		return this.isLocal;
-	}
-
-	public boolean isProxiable() {
-		return this.proxiable;
 	}
 
 }
