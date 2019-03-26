@@ -12,7 +12,19 @@
         <java-version>1.8</java-version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>ben-utils-mvn-repo</id>
+            <url>https://raw.githubusercontent.com/xu-ben/MyJavaUtils/master/repository</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>cn.xuben</groupId>
+            <artifactId>utils</artifactId>
+            <version>0.1</version>
+        </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
