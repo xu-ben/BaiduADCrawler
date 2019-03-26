@@ -4,7 +4,6 @@ import ben.crawler.proxy.ArrearsException;
 import ben.crawler.proxy.ZMProxy;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -30,9 +29,7 @@ public class Scheduler {
     public boolean crawlSomeCity(City[] cities, String datestr) throws IOException {
         boolean success = true;
         for (City city : cities) {
-            if (!city.isUseProxy() || city.getCitycode() > 0) {
-                success &= this.crawl(city, datestr);
-            }
+            success &= this.crawl(city, datestr);
         }
         return success;
     }
@@ -62,7 +59,7 @@ public class Scheduler {
                     if (cycles % 100 == 0) {
                         logger.info(String.format("cycles: %d", cycles));
                     } else if (cycles % 1000 == 0) {
-                        logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT\n", cycles, dateTimestamp));
+                        logger.info(String.format("cycles: %1$d,\tdatetime is:%2$tF %2$tT", cycles, dateTimestamp));
                     }
                     cycles++;
                     Thread.sleep(1000);
@@ -77,33 +74,27 @@ public class Scheduler {
     }
 
 
-    private static City[] getAllCitiesProxiable() {
-        final City[] cities = {City.BEIJING, City.SHENZHEN, City.HAERBIN};
-        final City[] results = City.getAllCitiesExclude(cities);
-        return results;
-    }
-
-
     public static void complement(Scheduler scheduler) throws IOException {
-        String datestr = "20181226a";
-//        City[] cities = {City.KUNMING, City.SHENYANG, City.HAERBIN};
-//        scheduler.crawlSomeCity(cities, datestr);
-        City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.HAERBIN};
-        scheduler.crawlSomeCity(City.getAllCitiesExclude(cities), datestr);
-//        scheduler.crawlSomeCity(new City[]{City.BEIJING}, datestr);
+        String datestr = "20190326a";
+        City[] cities = {City.KUNMING, City.GUANGZHOU};
+        scheduler.crawlSomeCity(cities, datestr);
+//        City[] cities = {City.BEIJING, City.SHANGHAI, City.GUANGZHOU, City.SHENZHEN, City.ZHENGZHOU, City.NANJING, City.FUZHOU, City.HEFEI, City.CHANGSHA, City.HAERBIN};
+//        scheduler.crawlSomeCity(new City[]{City.KUNMING}, datestr);
 //        scheduler.crawlSomeCity(City.getAllCitiesExclude(new City[]{City.BEIJING}), datestr);
-//        scheduler.crawlSomeCity(getAllCitiesProxiable(), datestr);
+//        scheduler.crawlSomeCity(City.getAllProxiableCities(), datestr);
     }
+
+
 
     public static void main(String[] args) {
         String rootdir = "/home/ben/Develop/spider/html";
         ZMProxy zmProxy = new ZMProxy(true);
         try {
             Scheduler scheduler = new Scheduler(zmProxy, rootdir);
-            Calendar date = Calendar.getInstance();
-            date.set(2018, 12 - 1, 26, 16, 44, 0);
-            scheduler.crawlAllCityAt(date.getTimeInMillis());
-//            complement(scheduler);
+//            Calendar date = Calendar.getInstance();
+//            date.set(2018, 12 - 1, 29, 17, 42, 0);
+//            scheduler.crawlAllCityAt(date.getTimeInMillis());
+            complement(scheduler);
         } catch (ArrearsException ae) {
             ae.printStackTrace();
         } catch (IOException e) {

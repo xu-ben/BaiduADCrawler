@@ -5,6 +5,8 @@ import ben.crawler.bdadcrawler.City;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -54,7 +56,7 @@ public class ZMProxy {
         int code;
     }
 
-    public String fetchProxyFromServer(City city) throws IOException {
+    public Proxy fetchProxyFromServer(ZMCityCode city) throws IOException {
         if (useFreeApi) {
             return fetchProxyFromServer(FREE_URL, city, 2);
         } else {
@@ -99,10 +101,12 @@ public class ZMProxy {
         return true;
     }
 
-    private String fetchProxyFromServer(String baseurl, City city, int mosttry) throws IOException {
-        String url = String.format(baseurl, city.getProcode(), city.getCitycode());
+    private static Pattern pHostPort = Pattern.compile("\\s*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)\\s*");
+
+    private Proxy fetchProxyFromServer(String baseurl, ZMCityCode city, int mostTry) throws IOException {
+        String url = String.format(baseurl, city.getProCode(), city.getCityCode());
         String cmd = String.format("curl -A \"%s\" \"%s\"", Commons.chromeUserAgent, url);
-        for (int i = 0; i < mosttry; i++) { // 最多尝试mosttry次
+        for (int i = 0; i < mostTry; i++) { // 最多尝试mosttry次
             logger.info(cmd);
             String res = Commons.execCmdInDir(cmd, ".", 15);
             if (res == null || res.length() == 0) { // null说明超时了, 为空也不正常
@@ -113,8 +117,13 @@ public class ZMProxy {
                 if (!treatResult(res)) {
                     return null;
                 }
-            } else if (res.matches("\\s*\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+\\s*")) {
-                return res.trim();
+            } else {
+                Matcher m = pHostPort.matcher(res);
+                if (m.matches()) {
+                    InetSocketAddress addr = new InetSocketAddress(m.group(1), Integer.valueOf(m.group(2)));
+                    Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+                    return proxy;
+                }
             }
             try {
                 Thread.sleep(2000);
@@ -131,8 +140,8 @@ public class ZMProxy {
         String[] res = new String[cities.length];
         for (int i = 0; i < cities.length; i++) {
             City city = cities[i];
-            if (city.isUseProxy()) {
-                res[i] = fetchProxyFromServer(city);
+            if (!city.isLocal()) {
+                res[i] = fetchProxyFromServer(ZMCityCode.getZMCityCode(city)).toString();
             }
         }
         for (int i = 0; i < cities.length; i++) {
